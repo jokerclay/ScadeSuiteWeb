@@ -1,13 +1,47 @@
 ﻿@page "/"
+@using ScadeSuiteWeb.Shared.ViewModels.User
 @inject IToastService ToastService
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<FluentCard Width="800px" Height="400px">
+    <FluentStack Orientation="Orientation.Vertical"
+                 HorizontalAlignment="HorizontalAlignment.Center"
+                 VerticalAlignment="VerticalAlignment.Top"
+                 VerticalGap="20">
+        @* Style="border: 1px dotted rebeccapurple *@
+        <h2>Scade Suite Web Platform</h2>
+        
+        <div></div>
+        <div></div>
+        <div>
+            <FluentTextField @bind-Value=userVM.UserName Label="Username"></FluentTextField>
+        </div>
+        <div>
+            <FluentTextField @bind-Value=userVM.Password Minlength="4" Label="Password"></FluentTextField>
+        </div>
+        <div>
+            <FluentButton
+                Appearance="Appearance.Accent"
+                OnClick="@StartLoadingAsync">
+                登录
+            </FluentButton>
+        </div>
 
-Welcome to your new app.
-
-
-<FluentCard>
-  <h2>Hello World!</h2>
-  <FluentButton Appearance="@Appearance.Accent">Click Me</FluentButton>
+    </FluentStack>
 </FluentCard>
+
+<p>You entered UserName: @userVM.UserName</p>
+<p>You entered Password: @userVM.Password</p>
+
+@code {
+    UserVM userVM = new UserVM();
+    
+    /*
+    HorizontalAlignment Horizontal;
+    VerticalAlignment Vertical;
+    */
+     private void StartLoadingAsync(MouseEventArgs obj)
+     {
+         Console.WriteLine(  userVM.UserName + " -- " + userVM.Password );
+     }
+}
