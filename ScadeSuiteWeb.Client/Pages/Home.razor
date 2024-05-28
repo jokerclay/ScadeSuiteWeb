@@ -8,16 +8,17 @@
                  HorizontalAlignment="HorizontalAlignment.Center"
                  VerticalAlignment="VerticalAlignment.Top"
                  VerticalGap="20">
-        @* Style="border: 1px dotted rebeccapurple *@
+        @*Leaving the following line for debugging purposes *@
+        @*Style="border: 1px dotted rebeccapurple *@
         <h2>Scade Suite Web Platform</h2>
-        
+        @* 占位符，让内容向下走一点 *@
         <div></div>
         <div></div>
         <div>
-            <FluentTextField @bind-Value=userVM.UserName Label="Username"></FluentTextField>
+            <FluentTextField @bind-Value=userVm.UserName Label="Username"></FluentTextField>
         </div>
         <div>
-            <FluentTextField @bind-Value=userVM.Password Minlength="4" Label="Password"></FluentTextField>
+            <FluentTextField @bind-Value=userVm.Password Minlength="4" Label="Password"></FluentTextField>
         </div>
         <div>
             <FluentButton
@@ -30,18 +31,14 @@
     </FluentStack>
 </FluentCard>
 
-<p>You entered UserName: @userVM.UserName</p>
-<p>You entered Password: @userVM.Password</p>
+<p>You entered UserName: @userVm.UserName</p>
+<p>You entered Password: @userVm.Password</p>
 
 @code {
-    UserVM userVM = new UserVM();
-    
-    /*
-    HorizontalAlignment Horizontal;
-    VerticalAlignment Vertical;
-    */
+    public UserVM userVm = new UserVM();
+    // get the current user's information and sent it to the server for authentication
      private void StartLoadingAsync(MouseEventArgs obj)
      {
-         Console.WriteLine(  userVM.UserName + " -- " + userVM.Password );
+         Console.WriteLine(  userVm.UserName + " -- " + userVm.Password );
      }
 }
