@@ -1,8 +1,14 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider auth
+@inject NavigationManager Nm
+
 <div class="page">
-    <div class="sidebar">
+
+
+@*     <div class="sidebar">
         <NavMenu />
-    </div>
+    </div> *@
 
     <main>
 @*        
@@ -21,3 +27,36 @@
 <FluentDialogProvider />
 <FluentTooltipProvider />
 <FluentMessageBarProvider />
+
+
+@code{
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		var user = await auth.GetAuthenticationStateAsync();
+
+
+		var ca = user.User.Claims;
+		Console.WriteLine(ca);
+		if (user.User.Identity is null || !user.User.Identity.IsAuthenticated)
+		{
+			Nm.NavigateTo("/login");
+		}
+		else
+		{
+			// var ca = user.User.Claims;
+			// Console.WriteLine(ca);
+			/*	
+			if (ca != null)
+			{
+				authService.LoadToken(ca);
+			}
+			Name = authService.GetNickName();
+		*/
+		}
+
+
+	}
+}

@@ -1,0 +1,111 @@
+﻿@page "/login"
+@using ScadeSuiteWeb.Shared.ViewModels.User
+@inject IToastService ToastService
+
+<PageTitle>Login</PageTitle>
+
+
+<FluentStack Width="100%" VerticalGap="100" Orientation="Orientation.Vertical"
+             VerticalAlignment="VerticalAlignment.Center"
+             HorizontalAlignment="HorizontalAlignment.Center">
+    <div></div>
+    <h1>Scade Suite Web Platform</h1>
+    <FluentCard Width="400px" Height="300px">
+        <FluentStack Orientation="Orientation.Vertical"
+                     HorizontalAlignment="HorizontalAlignment.Center"
+                     VerticalAlignment="VerticalAlignment.Top"
+                     VerticalGap="20">
+            @*Leaving the following line for debugging purposes *@
+            @*Style="border: 1px dotted rebeccapurple *@
+
+            @* 占位符，让内容向下走一点 *@
+            <div></div>
+            <div></div>
+            <div>
+                <FluentTextField @bind-Value=userVm.UserName Label="Username"></FluentTextField>
+            </div>
+            <div>
+                <FluentTextField @bind-Value=userVm.Password Minlength="4" Label="Password"></FluentTextField>
+            </div>
+            <div>
+                <FluentButton Appearance="Appearance.Accent"
+                              OnClick="@StartLoadingAsync">
+                    Login
+                </FluentButton>
+            </div>
+        </FluentStack>
+    </FluentCard>
+@* 
+    <p>You entered UserName: @userVm.UserName</p>
+    <p>You entered Password: @userVm.Password</p> *@
+    <div>
+
+        <FluentDesignTheme @bind-Mode="@Mode"
+                           @bind-OfficeColor="@OfficeColor"
+                           OnLoaded="@OnLoaded"
+                           OnLuminanceChanged="@OnLuminanceChanged"
+                           StorageName="theme" />
+
+        <div style="min-height: 250px;">
+            <FluentGrid>
+                <FluentGridItem>
+                    <FluentSelect Label="Theme"
+                                  Width="250px"
+                                  Items="@(Enum.GetValues<DesignThemeModes>())"
+                                  @bind-SelectedOption="@Mode" />
+                </FluentGridItem>
+
+                <FluentGridItem>
+                    <FluentSelect Label="Color"
+                                  Items="@(Enum.GetValues<OfficeColor>().Select(i => (OfficeColor?)i))"
+                                  Height="200px"
+                                  Width="250px"
+                                  @bind-SelectedOption="@OfficeColor">
+                        <OptionTemplate>
+                            <FluentStack>
+                                <FluentLabel>@context</FluentLabel>
+                            </FluentStack>
+
+
+
+                        </OptionTemplate>
+                    </FluentSelect>
+                    <FluentButton Appearance="Appearance.Accent" OnClick="PickRandomColor">Feeling lucky?</FluentButton>
+                </FluentGridItem>
+            </FluentGrid>
+        </div>
+    </div>
+
+</FluentStack>
+
+
+
+@code {
+    public UserVM userVm = new UserVM();
+    // get the current user's information and sent it to the server for authentication
+    private void StartLoadingAsync(MouseEventArgs obj)
+    {
+        Console.WriteLine(userVm.UserName + " -- " + userVm.Password);
+    }
+
+    public DesignThemeModes Mode { get; set; }
+
+
+
+    public OfficeColor? OfficeColor { get; set; }
+
+    void OnLoaded(LoadedEventArgs e)
+    {
+        Console.WriteLine($"Loaded: {(e.Mode == DesignThemeModes.System ? "System" : "")} {(e.IsDark ? "Dark" : "Light")}");
+    }
+
+    void OnLuminanceChanged(LuminanceChangedEventArgs e)
+    {
+        Console.WriteLine($"Changed: {(e.Mode == DesignThemeModes.System ? "System" : "")} {(e.IsDark ? "Dark" : "Light")}");
+    }
+
+    void PickRandomColor()
+    {
+        OfficeColor = OfficeColorUtilities.GetRandom();
+    }
+}
