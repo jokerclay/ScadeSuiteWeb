@@ -1,44 +1,38 @@
 ﻿@page "/"
-@using ScadeSuiteWeb.Shared.ViewModels.User
+@using ScadeSuiteWeb.Client.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IToastService ToastService
+@inject IAuthService AuthService
+@inject AuthenticationStateProvider auth
+@inject NavigationManager Nm
 <PageTitle>Home</PageTitle>
-
-<FluentCard Width="800px" Height="400px">
-    <FluentStack Orientation="Orientation.Vertical"
-                 HorizontalAlignment="HorizontalAlignment.Center"
-                 VerticalAlignment="VerticalAlignment.Top"
-                 VerticalGap="20">
-        @*Leaving the following line for debugging purposes *@
-        @*Style="border: 1px dotted rebeccapurple *@
-        <h2>Scade Suite Web Platform</h2>
-        @* 占位符，让内容向下走一点 *@
-        <div></div>
-        <div></div>
-        <div>
-            <FluentTextField @bind-Value=userVm.UserName Label="Username"></FluentTextField>
-        </div>
-        <div>
-            <FluentTextField @bind-Value=userVm.Password Minlength="4" Label="Password"></FluentTextField>
-        </div>
-        <div>
-            <FluentButton
-                Appearance="Appearance.Accent"
-                OnClick="@StartLoadingAsync">
-                Login
-            </FluentButton>
-        </div>
-
-    </FluentStack>
-</FluentCard>
-
-<p>You entered UserName: @userVm.UserName</p>
-<p>You entered Password: @userVm.Password</p>
+<pre>
+-----------------------------
+@Name 
+-----------------------------
+</pre>
 
 @code {
-    public UserVM userVm = new UserVM();
-    // get the current user's information and sent it to the server for authentication
-     private void StartLoadingAsync(MouseEventArgs obj)
-     {
-         Console.WriteLine(  userVm.UserName + " -- " + userVm.Password );
-     }
+
+	public string Name { get; set; }
+    protected override async Task<Task> OnInitializedAsync()
+    
+    {
+		// var userAuthenticationState = await auth.GetAuthenticationStateAsync();
+		// if (userAuthenticationState.User.Identity is null || !userAuthenticationState.User.Identity.IsAuthenticated)
+		// {
+		// 	Nm.NavigateTo("/login");
+		// }
+		// else
+		// {
+		// 	var ca = userAuthenticationState.User.Claims;
+		// 	AuthService.LoadToken(ca);
+		// 	Name = AuthService.GetNickName();
+		// 	Console.WriteLine(Name);
+		// }
+
+        
+        return base.OnInitializedAsync();
+    }
+
 }

@@ -1,27 +1,46 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using ScadeSuiteWeb.Client.Services
 @inherits LayoutComponentBase
 @inject AuthenticationStateProvider auth
 @inject NavigationManager Nm
+@inject IAuthService AuthService
 
-<div class="page">
+@Body
+
+@* 
+			<AuthorizeView>
+				<Authorized>
+					@Body
+				</Authorized>
+				<NotAuthorized>
+					<div style="width:100%; text-align: center; color: red;">
+						<span style="font-size:20px">检测到登录超时，请重新<a href="./login" style="text-decoration:underline">登录</a>！</span>
+					</div> 
+				</NotAuthorized>
+			</AuthorizeView>
+ *@
+
+@*  <AuthorizeView>
+    <Authorized>
+		FASDFA
+    </Authorized>
+    <NotAuthorized>
+        <a href="/login" class="text-white btn btn-primary">登&nbsp;&nbsp;录</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView>
+	<Authorized>
+		@Body
+	</Authorized>
+	<NotAuthorized>
+		<div style="width:100%; text-align: center; color: red;">
+			<span style="font-size:20px">检测到登录超时，请重新<a href="/login" style="text-decoration:underline">登录</a>！</span>
+		</div>
+	</NotAuthorized>
+</AuthorizeView> *@
 
 
-@*     <div class="sidebar">
-        <NavMenu />
-    </div> *@
-
-    <main>
-@*        
-    <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div> 
-*@
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
 
 <FluentToastProvider />
 <FluentDialogProvider />
@@ -35,26 +54,19 @@
 	{
 		await base.OnInitializedAsync();
 
-		var user = await auth.GetAuthenticationStateAsync();
+		var userAuthenticationState = await auth.GetAuthenticationStateAsync();
 
 
-		var ca = user.User.Claims;
-		Console.WriteLine(ca);
-		if (user.User.Identity is null || !user.User.Identity.IsAuthenticated)
+		if (userAuthenticationState.User.Identity is null || !userAuthenticationState.User.Identity.IsAuthenticated)
 		{
 			Nm.NavigateTo("/login");
 		}
 		else
 		{
-			// var ca = user.User.Claims;
-			// Console.WriteLine(ca);
-			/*	
-			if (ca != null)
-			{
-				authService.LoadToken(ca);
-			}
-			Name = authService.GetNickName();
-		*/
+		var ca = userAuthenticationState.User.Claims;
+		AuthService.LoadToken(ca);
+		var Name = AuthService.GetNickName();
+		Console.WriteLine(Name);
 		}
 
 

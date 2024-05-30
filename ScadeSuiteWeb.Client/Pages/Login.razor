@@ -1,7 +1,10 @@
 ﻿@page "/login"
 @using ScadeSuiteWeb.Shared.ViewModels.User
+@using ScadeSuiteWeb.Client.Services
+@using ScadeSuiteWeb.Shared.ViewModels
+@inject IAuthService AuthService
+@inject NavigationManager Nm
 @inject IToastService ToastService
-
 <PageTitle>Login</PageTitle>
 
 
@@ -22,14 +25,15 @@
             <div></div>
             <div></div>
             <div>
-                <FluentTextField @bind-Value=userVm.UserName Label="Username"></FluentTextField>
+                <FluentTextField @bind-Value=_loginModel.UserName  Label="Username"></FluentTextField>
             </div>
             <div>
-                <FluentTextField @bind-Value=userVm.Password Minlength="4" Label="Password"></FluentTextField>
+                <FluentTextField @bind-Value=_loginModel.Password Minlength="4" Label="Password">
+                </FluentTextField>
             </div>
             <div>
                 <FluentButton Appearance="Appearance.Accent"
-                              OnClick="@StartLoadingAsync">
+                              OnClick="@StartLogin">
                     Login
                 </FluentButton>
             </div>
@@ -81,19 +85,34 @@
 
 
 @code {
-    public UserVM userVm = new UserVM();
-    // get the current user's information and sent it to the server for authentication
-    private void StartLoadingAsync(MouseEventArgs obj)
+    
+    public DesignThemeModes Mode { get; set; }
+    public OfficeColor? OfficeColor { get; set; }
+    private LoginViewModel _loginModel = new LoginViewModel()
     {
-        Console.WriteLine(userVm.UserName + " -- " + userVm.Password);
+        UserName = "admin",
+        Password = "adminadmin"
+    };
+    
+    // get the current user's information and sent it to the server for authentication
+    private async Task StartLogin(MouseEventArgs arg)
+    {
+        var result = await AuthService.Login(_loginModel );
+        
+        
+        if (result is { Successful: false, Token: null })
+        {
+             ToastService.ShowError("Invalid username or password");
+        }
+
+        if (result.Successful)
+        {
+        
+            Nm.NavigateTo("/");
+        }
     }
 
-    public DesignThemeModes Mode { get; set; }
-
-
-
-    public OfficeColor? OfficeColor { get; set; }
-
+    
     void OnLoaded(LoadedEventArgs e)
     {
         Console.WriteLine($"Loaded: {(e.Mode == DesignThemeModes.System ? "System" : "")} {(e.IsDark ? "Dark" : "Light")}");
@@ -108,4 +127,6 @@
     {
         OfficeColor = OfficeColorUtilities.GetRandom();
     }
+
+
 }

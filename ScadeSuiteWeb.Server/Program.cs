@@ -1,6 +1,9 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using ScadeSuiteWeb.Server.Database;
 using ScadeSuiteWeb.Server.Database.Data;
 using ScadeSuiteWeb.Server.Models.User;
@@ -81,6 +84,46 @@ builder.Services.AddIdentity<XUser, XRole>(opt =>
     .AddEntityFrameworkStores<AppDbContext>();
 #endregion
 
+
+
+#region Jwt 服务
+var configuration = builder.Configuration;
+var jwtSection = configuration.GetSection("JWT");
+var jwtOptions = jwtSection.Get<JwtOptions>();
+if (jwtOptions == null)
+{
+    throw new Exception("'appSetting.json' 中无效的 JWT配置");
+}
+
+builder.Services.AddAuthentication(opt =>
+    {
+        opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        // 保证JwtSecurityKey 的安全是非常重要的，因为这是用来对API产生的令牌签名的，如果泄露那么你的应用程序将不在安全。
+        // 由于我们在本地运行所有内容，所以我将Issuer和Audience设置为localhost。
+        // 如果在生产环境使用它，我们需要将Issuer 设置为API运行的域名，将Audience设置为客户端应用程序运行的域名。
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            RequireExpirationTime = true, // 是否必须存在失效时间
+            ValidateIssuer = true, // 是否验证 Issuer
+            ValidateAudience = true, // 是否验证 Audience
+            ValidateIssuerSigningKey = true, // 是否验证 签发者签名密钥
+            ValidateLifetime = true, // 是否验证失效时间
+            ValidIssuer = jwtOptions.Issuer, //  有效的 Issuer
+            ValidAudience = jwtOptions.Audience, //  有效的 Audience
+            IssuerSigningKey =  new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtOptions.Key)), // 签发者签名密钥
+        };
+    });
+
+// 将配置添加的DI中方便依赖注入
+builder.Services.Configure<JwtOptions>(jwtSection);
+
+
+#endregion
 
 
 var app = builder.Build();

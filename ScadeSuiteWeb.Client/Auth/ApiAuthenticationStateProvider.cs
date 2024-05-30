@@ -67,6 +67,35 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
         return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt")));
     }
 
+    /// <summary>
+    /// MarkUserAsAuthenticated 辅助方法用于登录时调用 NotifyAuthenticationStateChanged 方法，
+    ///     该方法触发 AuthenticationStateChanged 事件。
+    ///     这将通过 CascadingAuthenticationState 组件级联新的身份验证状态。
+    ///     MarkUserAsLoggedOut用于用户注销时。
+    /// </summary>
+    /// <param name="token"></param>
+    public IEnumerable<Claim> MarkUserAsAuthenticated(string token)
+    {
+        SetClaims(ParseClaimsFromJwt(token));
+            
+        var authenticatedUser = new ClaimsPrincipal(new ClaimsIdentity(_claims, "jwt"));
+        var authState = Task.FromResult(new AuthenticationState(authenticatedUser));
+        NotifyAuthenticationStateChanged(authState);
+        return _claims;
+    }
+    
+    
+    /// <summary>
+    /// 退出登录
+    /// </summary>
+    public void MarkUserAsLoggedOut()
+    {
+        var authState = Task.FromResult(new AuthenticationState(EmptyClaimsPrincipal));
+        NotifyAuthenticationStateChanged(authState);
+    }
+    
+    
+    
     private List<Claim> ParseClaimsFromJwt(string jwt)
     {
         JwtSecurityToken jwt1 = _securityTokenHandler.ReadJwtToken(jwt);
@@ -75,7 +104,7 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
 
     private void NavToLogin()
     {
-        _navigationManager.NavigateTo("./Login");
+        _navigationManager.NavigateTo("/login");
     }
     
     private void SetClaims(List<Claim> claims)

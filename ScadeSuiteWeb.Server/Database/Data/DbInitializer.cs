@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using ScadeSuiteWeb.Server.Models.User;
+using ScadeSuiteWeb.Shared.Utils;
 
 namespace ScadeSuiteWeb.Server.Database.Data;
 
@@ -13,9 +14,11 @@ public class DbInitializer(UserManager<XUser> userManager, RoleManager<XRole> ro
         await EnsureRoleCreatedAsync("Administrator", "管理员");
         await EnsureRoleCreatedAsync("Engineer", "工程师");
 
+        string adminPassword =  Encrypt.Sha256EncryptString("adminadmin");
+        string testengineerPassword =  Encrypt.Sha256EncryptString("123123");
         // Ensure users are created and assigned roles
-        await EnsureUserCreatedAsync("testengineer@example.com", "testengineer", "Engineer","adminadmin");
-        await EnsureUserCreatedAsync("admin@example.com", "admin", "Administrator", "123123");
+        await EnsureUserCreatedAsync("testengineer@example.com", "testengineer", "Engineer", testengineerPassword);
+        await EnsureUserCreatedAsync("admin@example.com", "admin", "Administrator", adminPassword );
     }
 
     private async Task EnsureRoleCreatedAsync(string roleName, string normalizedRoleName)
