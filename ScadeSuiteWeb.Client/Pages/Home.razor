@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using ScadeSuiteWeb.Client.Editor
 @using ScadeSuiteWeb.Client.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @inject IToastService ToastService
@@ -6,12 +7,12 @@
 @inject AuthenticationStateProvider auth
 @inject NavigationManager Nm
 <PageTitle>Home</PageTitle>
-<pre>
------------------------------
-@DisplayName 
-@UserName 
------------------------------
-</pre>
+
+
+<div style="width: 100vw; height: 100vh; background-color: transparent;">
+<SuiteEditor/>
+</div>
+
 
 @code {
 
