@@ -65,7 +65,7 @@
 		{
 		var ca = userAuthenticationState.User.Claims;
 		AuthService.LoadToken(ca);
-		var Name = AuthService.GetNickName();
+		var Name = AuthService.GetDisplayName();
 		Console.WriteLine(Name);
 		}
 

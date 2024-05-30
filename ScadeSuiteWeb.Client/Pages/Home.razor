@@ -8,28 +8,31 @@
 <PageTitle>Home</PageTitle>
 <pre>
 -----------------------------
-@Name 
+@DisplayName 
+@UserName 
 -----------------------------
 </pre>
 
 @code {
 
-	public string Name { get; set; }
+	public string DisplayName { get; set; }
+	public string UserName { get; set; }
+	
     protected override async Task<Task> OnInitializedAsync()
-    
     {
-		// var userAuthenticationState = await auth.GetAuthenticationStateAsync();
-		// if (userAuthenticationState.User.Identity is null || !userAuthenticationState.User.Identity.IsAuthenticated)
-		// {
-		// 	Nm.NavigateTo("/login");
-		// }
-		// else
-		// {
-		// 	var ca = userAuthenticationState.User.Claims;
-		// 	AuthService.LoadToken(ca);
-		// 	Name = AuthService.GetNickName();
-		// 	Console.WriteLine(Name);
-		// }
+		var userAuthenticationState = await auth.GetAuthenticationStateAsync();
+		if (userAuthenticationState.User.Identity is null || !userAuthenticationState.User.Identity.IsAuthenticated)
+		{
+			Nm.NavigateTo("/login");
+		}
+		else
+		{
+			var ca = userAuthenticationState.User.Claims;
+			AuthService.LoadToken(ca);
+			DisplayName = AuthService.GetDisplayName();
+			UserName  = AuthService.GetUserName();
+			Console.WriteLine(DisplayName);
+		}
 
         
         return base.OnInitializedAsync();

@@ -18,7 +18,7 @@ public class AuthService : IAuthService
     private readonly ApiAuthenticationStateProvider _authenticationStateProvider;
     private readonly ILocalStorageService _localStorage;
     private string _userName;
-    private string _nickName;
+    private string _displayName;
     private string _email;
     private List<string> _roles;
 
@@ -30,7 +30,7 @@ public class AuthService : IAuthService
         _authenticationStateProvider = (ApiAuthenticationStateProvider)authenticationStateProvider;
         _localStorage = localStorage;
         _userName = string.Empty;
-        _nickName = string.Empty;
+        _displayName = string.Empty;
         _email = string.Empty;
         _roles = new List<string>();
     }
@@ -154,7 +154,7 @@ public class AuthService : IAuthService
         ClearInfo();
         _httpClient.DefaultRequestHeaders.Authorization = null;
     }
-
+    
     public List<string> GetRoles()
     {
         return _roles;
@@ -163,9 +163,9 @@ public class AuthService : IAuthService
     {
         return _userName;
     }
-    public string GetNickName()
+    public string GetDisplayName()
     {
-        return _nickName;
+        return _displayName;
     }
     public bool HasRole(string role)
     {
@@ -201,7 +201,7 @@ public class AuthService : IAuthService
                     _email = token.Value;
                     break;
                 case ClaimTypes.Surname:
-                    _nickName = token.Value;
+                    _displayName = token.Value;
                     break;
             }
         }
@@ -209,7 +209,7 @@ public class AuthService : IAuthService
     public void ClearInfo()
     {
         _userName = string.Empty;
-        _nickName = string.Empty;
+        _displayName = string.Empty;
         _email = string.Empty;
         _roles = new List<string>();
     }
@@ -264,7 +264,7 @@ public interface IAuthService
     /// 获得登录用户的昵称，当未登录时为空字符串
     /// </summary>
     /// <returns></returns>
-    public string GetNickName();
+    public string GetDisplayName();
     /// <summary>
     /// 获得登录用户的邮箱，当未登录时为空字符串
     /// </summary>

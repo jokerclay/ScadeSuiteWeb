@@ -65,7 +65,6 @@ public class LoginController : ControllerBase
     public async Task<LoginResult> Login([FromBody] LoginViewModel login)
     {
         // 根据用户名获得登陆的用户
-        
         var user = await _signInManager.UserManager.FindByNameAsync(login.UserName);
 
         // 如果 找不到 用户
