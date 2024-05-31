@@ -9,6 +9,7 @@ using ScadeSuiteWeb.Server.Database.Data;
 using ScadeSuiteWeb.Server.Models.User;
 using ScadeSuiteWeb.Server.Options;
 using ScadeSuiteWeb.Server.Repositories;
+using ScadeSuiteWeb.Shared.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 

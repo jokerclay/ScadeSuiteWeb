@@ -1,6 +1,32 @@
-﻿
+﻿<FluentTreeView @bind-CurrentSelected=currentSelected OnExpandedChange="HandleOnExpandedChanged">
+    <FluentTreeItem Text="Root item 1">
+        <FluentTreeItem Text="Flowers">
+            <FluentTreeItem Disabled="true" Text="Daisy" />
+            <FluentTreeItem Text="Sunflower" />
+            <FluentTreeItem Text="Rose" />
+        </FluentTreeItem>
+        <FluentTreeItem Text="Nested item 2" />
+        <FluentTreeItem Text="Nested item 3" />
+    </FluentTreeItem>
+    <FluentTreeItem Text="Root item 2">
+        <FluentDivider></FluentDivider>
+        <FluentTreeItem Text="Flowers">
+            <FluentTreeItem Disabled="true" Text="Daisy" />
+            <FluentTreeItem Text="Sunflower" />
+            <FluentTreeItem Text="Rose" />
+        </FluentTreeItem>
+        <FluentTreeItem Text="Nested item 2" />
+        <FluentTreeItem Text="Nested item 3" />
+    </FluentTreeItem>
+    <FluentTreeItem Text="Root item 3 - Leaf Erikson" />
+</FluentTreeView>
 
-    <FluentTreeView >
+<p>Current selected tree item is @currentSelected?.Text</p>
+<p>Most recently expanded/collapsed tree item is @currentAffected?.Text</p>
+
+
+
+@*     <FluentTreeView >
         <FluentTreeItem @bind-Expanded=@FlowersExpanded >
             Flowers
             <FluentTreeItem @bind-Selected=DaisySelected>Daisy</FluentTreeItem>
@@ -14,7 +40,7 @@
             <FluentTreeItem>Cesna</FluentTreeItem>
         </FluentTreeItem>
     </FluentTreeView>
-
+ *@
 
 
 @* <FluentTreeView>
@@ -57,4 +83,13 @@
     bool DaisySelected = false;
     bool SunflowerSelected = true;
     bool RoseSelected = false;
+
+
+    FluentTreeItem? currentSelected;
+    FluentTreeItem? currentAffected;
+
+    private void HandleOnExpandedChanged(FluentTreeItem item)
+    {
+        currentAffected = item;
+    }
 }

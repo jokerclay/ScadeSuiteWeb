@@ -1,63 +1,80 @@
-﻿@implements IDialogContentComponent<SimplePerson>
+﻿@using ScadeSuiteWeb.Shared.ViewModels.PorjectModel
+@using ScadeSuiteWeb.Shared.Utils
+@implements IDialogContentComponent<ProjectsSimpleInfoVM>
+@inject HttpClient Http
+@inject IToastService ToastService
 
 <FluentMessageBarProvider  MaxMessageCount="1" />
 
-@* Sample using SelectedItems  *@
-<div>Using SelectedItems</div>
-
-<FluentDataGrid Items="@People" ShowHover="true" TGridItem="Person">
-    <SelectColumn TGridItem="Person"
-                  SelectMode="@Mode"
-                  @bind-SelectedItems="@SelectedItems" />
-    <PropertyColumn Width="100px" Property="@(p => p.PersonId)" Title="ID" />
-    <PropertyColumn Width="300px" Property="@(p => p.Name)" />
-    <PropertyColumn Width="150px" Property="@(p => p.BirthDate)" Format="yyyy-MM-dd" Sortable="true" />
+<FluentDataGrid Items="@projectsSimpleInfoVms" ShowHover="true" TGridItem="ProjectsSimpleInfoVM">
+    <SelectColumn TGridItem="ProjectsSimpleInfoVM"
+                  SelectMode="DataGridSelectMode.Single"
+                  Property="@(e => e.Selected)"
+                  OnSelect="@(e => e.Item.Selected = e.Selected)"
+                  />
+    <PropertyColumn Width="100px" Property="@(p => p.Id)" Title="ID"  Sortable="true"/>
+    <PropertyColumn Width="100px" Property="@(p => p.Name)"  Sortable="true"/>
+    <PropertyColumn Width="250px" Property="@(p => p.CreatedTime)" Format="yyyy-MM-dd HH:mm:ss" Sortable="true" />
 </FluentDataGrid>
 
-<div>
-    <b>SelectedItems:</b>
-    @String.Join("; ", SelectedItems.Select(p => p.Name))
-</div>
+  <div>
+      <b>ProjectFilePath</b>
+      <br>
+      @if (projectsSimpleInfoVms is not null)
+      {
+        @String.Join("; ", projectsSimpleInfoVms.Where(p => p.Selected).Select(p => p.ProjectFilePath))
+      }
+  </div>
 
 
 @code {
-
-    [Parameter] public SimplePerson Content { get; set; } = default!;
-
+    
+    public ProjectsSimpleInfoVM Content { get; set; }
     [CascadingParameter] public FluentDialog? Dialog { get; set; }
+    private IEnumerable <ProjectsSimpleInfoVM>? ProjectSimpleInfoData { get; set; }
+    private static IQueryable<ProjectsSimpleInfoVM>? projectsSimpleInfoVms { get; set; }
 
-    private void ToggleDialogPrimaryActionButton(bool enable)
+    protected override async Task<Task> OnParametersSetAsync()
     {
-        Dialog!.TogglePrimaryActionButton(enable);
+        var res = await Http.GetFromJsonAsync<ResponResult<IEnumerable<ProjectsSimpleInfoVM>>>("https://localhost:7061/api/ModelFolder/GetModelFolderInfo");
+        if (res != null)
+        {
+            if (res.Success)
+            {
+                if (res.Data != null) ProjectSimpleInfoData = res.Data;
+                if (ProjectSimpleInfoData  == null)
+                {
+                    return Task.CompletedTask;
+                }
+                StateHasChanged();
+            }
+            else
+            {
+             ToastService.ShowError($"{res.Message}");
+            }
+        }
+        else
+        {
+             ToastService.ShowError("网络错误");
+        }
+
+        if (ProjectSimpleInfoData != null)
+        {
+            projectsSimpleInfoVms = ProjectSimpleInfoData.AsQueryable();
+        }
+
+        return base.OnParametersSetAsync();
+        
     }
 
-    // ---------------------------------------------------
-
-    bool UseSelectedItems = true;
-    DataGridSelectMode Mode = DataGridSelectMode.Single;
-
-    IEnumerable<Person> SelectedItems = People.Where(p => p.Selected);
-
-    record Person(int PersonId, string Name, DateOnly BirthDate)
-    {
-        public bool Selected { get; set; }
-    };
-
-    static IQueryable<Person> People = new[]
-    {
-        new Person(10895, "Jean Martin", new DateOnly(1985, 3, 16)) { Selected = true },
-        new Person(10944, "António Langa", new DateOnly(1991, 12, 1)),
-        new Person(11203, "Julie Smith", new DateOnly(1958, 10, 10)),
-        new Person(11205, "Nur Sari", new DateOnly(1922, 4, 27)),
-        new Person(11898, "Jose Hernandez", new DateOnly(2011, 5, 3)),
-        new Person(12130, "Kenji Sato", new DateOnly(2004, 1, 9)),
-    }.AsQueryable();
-
+    
+    /*
     private void ResetSelectItems()
     {
         People.ToList().ForEach(i => i.Selected = false);
         People.First().Selected = true;
         SelectedItems = People.Where(p => p.Selected);
     }
-
+    
+*/
 }
