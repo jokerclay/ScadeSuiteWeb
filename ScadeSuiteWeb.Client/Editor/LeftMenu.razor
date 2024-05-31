@@ -1,48 +1,71 @@
 ﻿@using System.Diagnostics.CodeAnalysis
 <FluentTreeView @bind-CurrentSelected=currentSelected OnExpandedChange="HandleOnExpandedChanged">
-   
-       @if (Project != null)
-       {
-           
-       <FluentTreeItem Text="@ProjectName">
-           @foreach (var item in Project.Roots)
-           {
-        <FluentTreeItem Text="@item.Name">
-    
-                   @if (item is SdyFolder folder)
-                   {
-                       foreach (var obj in folder.Elements)
-                       {
-                           if (obj is SdyFileRef fileRef)
-                           {
-                               <FluentTreeItem Text="@fileRef.PersistAs"/>
-                           }
-                       }
-                   }
+
+    @if (Project != null)
+    {
+        <FluentTreeItem Id="myId4"  Text="@ProjectName">
+            @foreach (var item in Project.Roots)
+            {
+                <FluentTreeItem Text="@item.Name" >
+                        <FluentIcon Value="@(new Icons.Regular.Size20.Folder())" Color="@Color.Neutral" Slot="start" />
+                        <FluentIcon Value="@(new Icons.Regular.Size20.Folder())" Color="@Color.Neutral" Slot="start" />
+                    @if (item is SdyFolder folder)
+                    {
+                        foreach (var obj in folder.Elements)
+                        {
+                            if (obj is SdyFileRef fileRef)
+                            {
+                                <FluentTreeItem Text="@fileRef.PersistAs">
+                                    <FluentIcon Value="@(new Icons.Regular.Size20.Document())" Color="@Color.Neutral" Slot="start"/>
+                                </FluentTreeItem>
+                            }
+                        }
+                    }
+                </FluentTreeItem>
+            }
         </FluentTreeItem>
-               <br/>
-           }
-           
-       </FluentTreeItem>
-       }
+    }
 </FluentTreeView>
 
 <p>Current selected tree item is @currentSelected?.Text</p>
 <p>Most recently expanded/collapsed tree item is @currentAffected?.Text</p>
 
+<FluentMenu Anchor="myId4" Trigger="MouseButton.Right" Anchored="false" @onmenuchange=OnMenuChange>
+    <FluentMenuItem Label="Item 1" OnClick="@((e) => Console.WriteLine("Item 1 Clicked"))" />
+
+    <FluentMenuItem Label="Item 2">
+        <MenuItems>
+            <FluentMenuItem Label="Item 2.1">
+                <MenuItems>
+                    <FluentMenuItem Label="Item 2.1.1" OnClick="@((e) => Console.WriteLine("Item 2.1.1 Clicked"))" />
+                    <FluentMenuItem Label="Item 2.1.2" OnClick="@((e) => Console.WriteLine("Item 2.1.2 Clicked"))" />
+                </MenuItems>
+            </FluentMenuItem>
+            <FluentMenuItem Label="Item 2.2" OnClick="@((e) => Console.WriteLine("Item 2.2 Clicked"))" />
+        </MenuItems>
+    </FluentMenuItem>
+
+    <FluentMenuItem Label="Item 3" OnClick="@((e) => Console.WriteLine("Item 3 Clicked"))" />
+</FluentMenu>
+
+<p>@status</p>
+
+
+
+
 @code
 {
     [Parameter]
     public double NewSize { get; set; }
-    
+
     [Parameter]
     public SdyConfiguration? Project { get; set; }
-    
-    
+
+
     [Parameter]
     public string? ProjectName { get; set; }
-    
-    
+
+
     bool FlowersExpanded = true;
     bool PlanesExpanded = true;
     bool DaisySelected = false;
@@ -56,5 +79,20 @@
     private void HandleOnExpandedChanged(FluentTreeItem item)
     {
         currentAffected = item;
+        if (currentAffected.Expanded)
+        {
+            var a = currentAffected.ChildContent;
+
+        }
+    }
+
+    // ------------------------------------------------------
+
+    private string status = "";
+
+    private void OnMenuChange(MenuChangeEventArgs args)
+    {
+        if (args is not null && args.Value is not null)
+            status = $"Item \"{args.Value}\" clicked";
     }
 }
