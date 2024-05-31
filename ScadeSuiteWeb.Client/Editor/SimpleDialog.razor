@@ -26,10 +26,17 @@
       }
   </div>
 
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync">Open This Project</FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
 
 @code {
     
-    public ProjectsSimpleInfoVM Content { get; set; }
+    [Parameter]
+    public ProjectsSimpleInfoVM? Content { get; set; }
+    
+    
     [CascadingParameter] public FluentDialog? Dialog { get; set; }
     private IEnumerable <ProjectsSimpleInfoVM>? ProjectSimpleInfoData { get; set; }
     private static IQueryable<ProjectsSimpleInfoVM>? projectsSimpleInfoVms { get; set; }
@@ -62,11 +69,20 @@
         {
             projectsSimpleInfoVms = ProjectSimpleInfoData.AsQueryable();
         }
-
         return base.OnParametersSetAsync();
-        
     }
 
+    private async Task SaveAsync()
+    {
+        if (projectsSimpleInfoVms != null) Content = projectsSimpleInfoVms.FirstOrDefault(p => p.Selected);
+        if (Dialog!= null)
+            await Dialog.CloseAsync(Content);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
     
     /*
     private void ResetSelectItems()

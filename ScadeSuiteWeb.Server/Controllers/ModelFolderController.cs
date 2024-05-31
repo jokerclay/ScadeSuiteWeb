@@ -2,6 +2,12 @@
 using ScadeSuiteWeb.Server.Models.ProjectModel;
 using ScadeSuiteWeb.Shared.Utils;
 using ScadeSuiteWeb.Shared.ViewModels.PorjectModel;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using JsonSerializer = System.Text.Json.JsonSerializer;
+
+
+using static Microsoft.FluentUI.AspNetCore.Components.Emojis.FoodDrink.Color.Default;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -9,19 +15,19 @@ namespace ScadeSuiteWeb.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ModelFolderController : ControllerBase 
+    public class ModelFolderController : ControllerBase
     {
-        
+
         [HttpGet]
         [Route("GetModelFolderInfo")]
-        public async    Task<ResponResult<IEnumerable<ProjectsSimpleInfoVM>>> GetModelFolderInfo()
+        public async Task<ResponResult<IEnumerable<ProjectsSimpleInfoVM>>> GetModelFolderInfo()
         {
             List<ProjectsSimpleInfo> projectsSimpleInfos = new List<ProjectsSimpleInfo>();
             if (projectsSimpleInfos == null) throw new ArgumentNullException(nameof(projectsSimpleInfos));
 
             var resourcesFilePath = CommonHelper.SystemResourcesFilePath;
-            var modelFilePath = Path.Combine(resourcesFilePath , "SuiteModels");
-            
+            var modelFilePath = Path.Combine(resourcesFilePath, "SuiteModels");
+
             string[] subfolders = Directory.GetDirectories(modelFilePath);
 
             for (int i = 0; i < subfolders.Length; ++i)
@@ -47,48 +53,45 @@ namespace ScadeSuiteWeb.Server.Controllers
                     ProjectFilePath = project.ProjectFilePath
                 });
             }
-            
+
             return new ResponResult<IEnumerable<ProjectsSimpleInfoVM>>
             {
                 Success = true,
                 Data = projectsSimpleInfosVm
             };
         }
-        
-        
-        
-        
-        
-        
-        /*
-         
+
+
         [HttpGet(Name = "LoadModel")]
-        public SdyProject LoadModel(string filePath)
+        public async Task<ResponResult<string>> LoadModel(int id)
         {
-        string filePath = Path.Combine(currentDirectory, "ABC_N", "ABC_N.etp");
-        SdyProject pj = new SdyProject();
-            if (pj.LoadProjectFile(filePath))
-        {
-            //var options = new JsonSerializerOptions { WriteIndented = true };
+            var resourcesFilePath = CommonHelper.SystemResourcesFilePath;
+            var modelFilePath = Path.Combine(resourcesFilePath, "SuiteModels");
+            string[] subfolders = Directory.GetDirectories(modelFilePath);
 
-            var projectJsonString = JsonConvert.SerializeObject(pj);
-    
-            // Print the JSON string
-            // Console.WriteLine(projectJsonString);
-   
-            // Define the path to save the JSON file
-            // string outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), "project.json");
+            SdyProject pj = new SdyProject();
 
-            // Save the JSON string to a file
-            // File.WriteAllText(outputFilePath , projectJsonString );
+            for (int i = 0; i < subfolders.Length; ++i)
+            {
+                if (i == id)
+                {
+                    var filePath = subfolders[i] + "\\ABC_N.etp";
+                    if (pj.LoadProjectFile(filePath))
+                    {
+                        var projectJsonString = JsonConvert.SerializeObject(pj);
 
-            // Optionally, print a message to confirm saving
-            // Console.WriteLine($"JSON file saved to: {outputFilePath }");
-            return pj;
+                        return new ResponResult<string>
+                        {
+                            Success = true,
+                            Data = projectJsonString
+                        };
+                    }
+                }
+            }
+            return new ResponResult<string>
+            {
+                Success = false,
+            };
         }
-            return pj;
-        }
-        */
-        
     }
 }

@@ -1,81 +1,46 @@
-﻿<FluentTreeView @bind-CurrentSelected=currentSelected OnExpandedChange="HandleOnExpandedChanged">
-    <FluentTreeItem Text="Root item 1">
-        <FluentTreeItem Text="Flowers">
-            <FluentTreeItem Disabled="true" Text="Daisy" />
-            <FluentTreeItem Text="Sunflower" />
-            <FluentTreeItem Text="Rose" />
+﻿@using System.Diagnostics.CodeAnalysis
+<FluentTreeView @bind-CurrentSelected=currentSelected OnExpandedChange="HandleOnExpandedChanged">
+   
+       @if (Project != null)
+       {
+           
+       <FluentTreeItem Text="@ProjectName">
+           @foreach (var item in Project.Roots)
+           {
+        <FluentTreeItem Text="@item.Name">
+    
+                   @if (item is SdyFolder folder)
+                   {
+                       foreach (var obj in folder.Elements)
+                       {
+                           if (obj is SdyFileRef fileRef)
+                           {
+                               <FluentTreeItem Text="@fileRef.PersistAs"/>
+                           }
+                       }
+                   }
         </FluentTreeItem>
-        <FluentTreeItem Text="Nested item 2" />
-        <FluentTreeItem Text="Nested item 3" />
-    </FluentTreeItem>
-    <FluentTreeItem Text="Root item 2">
-        <FluentDivider></FluentDivider>
-        <FluentTreeItem Text="Flowers">
-            <FluentTreeItem Disabled="true" Text="Daisy" />
-            <FluentTreeItem Text="Sunflower" />
-            <FluentTreeItem Text="Rose" />
-        </FluentTreeItem>
-        <FluentTreeItem Text="Nested item 2" />
-        <FluentTreeItem Text="Nested item 3" />
-    </FluentTreeItem>
-    <FluentTreeItem Text="Root item 3 - Leaf Erikson" />
+               <br/>
+           }
+           
+       </FluentTreeItem>
+       }
 </FluentTreeView>
 
 <p>Current selected tree item is @currentSelected?.Text</p>
 <p>Most recently expanded/collapsed tree item is @currentAffected?.Text</p>
-
-
-
-@*     <FluentTreeView >
-        <FluentTreeItem @bind-Expanded=@FlowersExpanded >
-            Flowers
-            <FluentTreeItem @bind-Selected=DaisySelected>Daisy</FluentTreeItem>
-            <FluentTreeItem @bind-Selected=SunflowerSelected>Sunflower</FluentTreeItem>
-            <FluentTreeItem @bind-Selected=RoseSelected>Rose</FluentTreeItem>
-        </FluentTreeItem>
-        <FluentTreeItem @bind-Expanded=@PlanesExpanded>
-            Planes
-            <FluentTreeItem>Tomcat</FluentTreeItem>
-            <FluentTreeItem>Hawker Harrier</FluentTreeItem>
-            <FluentTreeItem>Cesna</FluentTreeItem>
-        </FluentTreeItem>
-    </FluentTreeView>
- *@
-
-
-@* <FluentTreeView>
-    <FluentTreeItem InitiallyExpanded="true">
-        Root item
-        <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" Color="@Color.Neutral" Slot="start" />
-        <FluentTreeItem InitiallyExpanded="true">
-            Nested Root item 1
-            <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" Color="@Color.Neutral" Slot="start" />
-            <FluentTreeItem>
-                <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" Color="@Color.Neutral" Slot="start" />
-                Nested item 4
-            </FluentTreeItem>
-            <FluentTreeItem>
-
-                Nested item 5
-            </FluentTreeItem>
-        </FluentTreeItem>
-        <FluentTreeItem>
-            Nested item 2
-
-        </FluentTreeItem>
-        <FluentTreeItem>
-            Nested item 3
-            <FluentIcon Value="@(new Icons.Regular.Size16.Globe())" Color="@Color.Neutral" Slot="start" />
-        </FluentTreeItem>
-    </FluentTreeItem>
-</FluentTreeView> *@
-
 
 @code
 {
     [Parameter]
     public double NewSize { get; set; }
     
+    [Parameter]
+    public SdyConfiguration? Project { get; set; }
+    
+    
+    [Parameter]
+    public string? ProjectName { get; set; }
     
     
     bool FlowersExpanded = true;
