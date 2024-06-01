@@ -1,4 +1,5 @@
 ﻿@using System.Diagnostics.CodeAnalysis
+@using ScadeSuiteWeb.Shared.ViewModels.PorjectModel
 <FluentTreeView @bind-CurrentSelected=currentSelected OnExpandedChange="HandleOnExpandedChanged">
 
     @if (Project != null)
@@ -8,7 +9,9 @@
             {
                 <FluentTreeItem Text="@item.Name" >
                         <FluentIcon Value="@(new Icons.Regular.Size20.Folder())" Color="@Color.Neutral" Slot="start" />
-                        <FluentIcon Value="@(new Icons.Regular.Size20.Folder())" Color="@Color.Neutral" Slot="start" />
+                        @*
+                        <FluentIcon Value="@(new Icons.Regular.Size20.FolderOpen())" Color="@Color.Neutral" Slot="start" />
+                        *@
                     @if (item is SdyFolder folder)
                     {
                         foreach (var obj in folder.Elements)
@@ -31,21 +34,8 @@
 <p>Most recently expanded/collapsed tree item is @currentAffected?.Text</p>
 
 <FluentMenu Anchor="myId4" Trigger="MouseButton.Right" Anchored="false" @onmenuchange=OnMenuChange>
-    <FluentMenuItem Label="Item 1" OnClick="@((e) => Console.WriteLine("Item 1 Clicked"))" />
-
-    <FluentMenuItem Label="Item 2">
-        <MenuItems>
-            <FluentMenuItem Label="Item 2.1">
-                <MenuItems>
-                    <FluentMenuItem Label="Item 2.1.1" OnClick="@((e) => Console.WriteLine("Item 2.1.1 Clicked"))" />
-                    <FluentMenuItem Label="Item 2.1.2" OnClick="@((e) => Console.WriteLine("Item 2.1.2 Clicked"))" />
-                </MenuItems>
-            </FluentMenuItem>
-            <FluentMenuItem Label="Item 2.2" OnClick="@((e) => Console.WriteLine("Item 2.2 Clicked"))" />
-        </MenuItems>
-    </FluentMenuItem>
-
-    <FluentMenuItem Label="Item 3" OnClick="@((e) => Console.WriteLine("Item 3 Clicked"))" />
+    <FluentMenuItem Label="New Folder" OnClick="@((e) => Console.WriteLine("New Folder"))" />
+    <FluentMenuItem Label="New File" OnClick="@((e) => Console.WriteLine("New File"))" />
 </FluentMenu>
 
 <p>@status</p>
@@ -60,7 +50,6 @@
 
     [Parameter]
     public SdyConfiguration? Project { get; set; }
-
 
     [Parameter]
     public string? ProjectName { get; set; }
@@ -81,18 +70,36 @@
         currentAffected = item;
         if (currentAffected.Expanded)
         {
-            var a = currentAffected.ChildContent;
-
+            // var a = currentAffected.ChildContent;
         }
     }
-
     // ------------------------------------------------------
-
     private string status = "";
 
     private void OnMenuChange(MenuChangeEventArgs args)
     {
-        if (args is not null && args.Value is not null)
+        /*
+        if ( args.Value is not null)
             status = $"Item \"{args.Value}\" clicked";
+        */
+        if (args.Value is not null)
+        {
+
+            switch (args.Value)
+            {
+                case "New Folder":
+                    // TODO: create a new folder
+                    break;
+                    
+                case "New File":
+                    // TODO: create a new file
+                    break;
+                    
+                    default:
+                    break;
+            }
+            
+        }
+        
     }
 }
