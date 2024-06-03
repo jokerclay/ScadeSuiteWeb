@@ -52,6 +52,22 @@
     FluentTreeItem? currentSelected;
     FluentTreeItem? currentAffected;
 
+    private async Task<bool> ValidateCreation()
+    {
+        if (String.IsNullOrEmpty(currentSelected?.Text ))
+        {
+            var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
+                                                                          <h1> Please select a folder to create a new folder or file </h1>
+                                                                      </div>
+            , new DialogParameters
+            {
+                Title = "Creating a New Folder",
+            });
+            return false;
+        }
+        return true;
+    }
+
     private void HandleOnExpandedChanged(FluentTreeItem item)
     {
         currentAffected = item;
@@ -87,6 +103,8 @@
     
     private async Task CreateNewFolder(MouseEventArgs e)
     {
+        if (!await ValidateCreation()) return;
+        
         Console.WriteLine($"{e}New Folder");
         var folderName = string.Empty;
         var folerExtension = string.Empty;
