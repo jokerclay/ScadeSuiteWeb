@@ -208,8 +208,7 @@
         {
             DialogData = (ProjectsSimpleInfoVM)result.Data;
             Console.WriteLine($"Dialog closed with result: {DialogData.Id}");
-
-            var res = await Http.GetFromJsonAsync<ResponResult<string>>($"https://localhost:7061/api/ModelFolder?id={DialogData.Id}");
+            var res = await Http.GetFromJsonAsync<ResponResult<string>>($"https://localhost:7061/api/ModelFolder/LoadModel?id={DialogData.Id}");
             if (res != null)
             {
                 JObject projectJson = (JObject)JsonConvert.DeserializeObject(res.Data)!;

@@ -1,5 +1,7 @@
 ﻿@using System.Diagnostics.CodeAnalysis
 @using ScadeSuiteWeb.Shared.ViewModels.PorjectModel
+@inject IDialogService _dialogService
+
 <FluentTreeView @bind-CurrentSelected=currentSelected OnExpandedChange="HandleOnExpandedChanged">
 
     @if (Project != null)
@@ -34,14 +36,14 @@
 <p>Most recently expanded/collapsed tree item is @currentAffected?.Text</p>
 
 <FluentMenu Anchor="myId4" Trigger="MouseButton.Right" Anchored="false" @onmenuchange=OnMenuChange>
-    <FluentMenuItem Label="New Folder" OnClick="@((e) => Console.WriteLine("New Folder"))" />
-    <FluentMenuItem Label="New File" OnClick="@((e) => Console.WriteLine("New File"))" />
+    <FluentMenuItem Label="New Folder" OnClick="@CreateNewFolder" />
+    <FluentMenuItem  Label="New File" OnClick="@CreateNewFile" >
+    </FluentMenuItem > 
 </FluentMenu>
 
 <p>@status</p>
 
-
-
+<hr>
 
 @code
 {
@@ -78,10 +80,6 @@
 
     private void OnMenuChange(MenuChangeEventArgs args)
     {
-        /*
-        if ( args.Value is not null)
-            status = $"Item \"{args.Value}\" clicked";
-        */
         if (args.Value is not null)
         {
 
@@ -100,6 +98,105 @@
             }
             
         }
-        
+    }
+    
+    private async Task CreateNewFolder(MouseEventArgs e)
+    {
+        Console.WriteLine($"{e}New Folder");
+        var folderName = string.Empty;
+        var folerExtension = string.Empty;
+        var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
+                                                                      <FluentTextField @bind-Value=folderName  Label="Folder Name:" />
+                                                                      <FluentTextField @bind-Value=folerExtension  Label="Folder Extension:" />
+                                                                  </div>
+            , new DialogParameters
+            {
+                Title = "Creating a New Folder",
+            });
+
+        var result = await dialogInstance.Result;
+        if (!result.Cancelled)
+        {
+            await _dialogService.ShowSuccessAsync($"You entered:Folder Name: {folderName}, Folder Extension: {folerExtension}", "Success");
+        }
+    }
+    
+        FluentInputFileEventArgs[] Files = Array.Empty<FluentInputFileEventArgs>();
+        int ProgressPercent = 0;
+        private async Task OnCompletedAsync(IEnumerable<FluentInputFileEventArgs> files)
+        {
+            Files = files.ToArray();
+
+            // For the demo, delete these files.
+            foreach (var file in Files)
+            {
+                file.LocalFile?.Delete();
+            }
+
+            // Wait 3 seconds before to reset the progress bar.
+            await Task.Delay(3000);
+            ProgressPercent = 0;
+        }
+    
+    
+    private async Task CreateNewFile(MouseEventArgs e)
+    {
+        Console.WriteLine($"{e}New File");
+        var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
+                                                                      <FluentInputFile Id="my-file-uploader"
+                                                                                       Mode="InputFileMode.SaveToTemporaryFolder"
+                                                                                       Multiple="true"
+                                                                                       MaximumFileCount="4"
+                                                                                       MaximumFileSize="@(10*1024*1024)"
+                                                                                       Accept="image/*"
+                                                                                       @bind-ProgressPercent="@ProgressPercent"
+                                                                                       OnCompleted="@OnCompletedAsync"
+                                                                                       Style="height: 300px; border: 1px dashed red;">
+                                                                          <ChildContent>
+                                                                              <label for="my-file-uploader">
+                                                                                  <FluentIcon Value="@(new @Icons.Regular.Size24.ArrowUpload())" />
+                                                                              </label>
+                                                                      
+                                                                              <div>
+                                                                                  Drag files here you wish to upload,
+                                                                                  or <label for="my-file-uploader">browse</label>
+                                                                                  for them<span style="color: red;">*</span>.
+                                                                                  <br />
+                                                                                  <em>Maximum of 4 files allowed.</em>
+                                                                              </div>
+                                                                      
+                                                                              <div>
+                                                                                  <br />
+                                                                                  <a href="#">Read more about our supported file formats.</a>
+                                                                              </div>
+                                                                          </ChildContent>
+                                                                      </FluentInputFile>
+                                                                      @if (Files.Any())
+                                                                      {
+                                                                          <h4>File(s) uploaded:</h4>
+                                                                          <ul>
+                                                                              @foreach (var file in Files)
+                                                                              {
+                                                                                  <li>
+                                                                                      <b>@file.Name</b> 🔹
+                                                                                      @($"{Decimal.Divide(file.Size, 1024):N} KB") 🔹
+                                                                                      @file.ContentType 🔹
+                                                                                      @file.LocalFile?.FullName
+                                                                                      @file.ErrorMessage
+                                                                                  </li>
+                                                                              }
+                                                                          </ul>
+                                                                      }
+                                                                  </div>
+            , new DialogParameters
+            {
+                Title = "Creating a New File",
+            });
+
+        var result = await dialogInstance.Result;
+        if (!result.Cancelled)
+        {
+            await _dialogService.ShowSuccessAsync($"You entered: ", "Success");
+        }
     }
 }

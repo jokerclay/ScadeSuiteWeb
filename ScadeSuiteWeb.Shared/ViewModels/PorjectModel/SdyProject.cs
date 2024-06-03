@@ -213,12 +213,17 @@ public class SdyProject : ModelObject
     /// </summary>
     /// <param name="folderPath"></param>
     /// <returns></returns>
-    public XmlDocument ToXML(string folderPath)
+    public XmlDocument ToXML()
+    
     {
+        /*
+        string folderPath
         if (!Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
         }
+        
+        */
 
         //创建一个文档etpdoc
         XmlDocument etpDoc = new();
@@ -273,7 +278,7 @@ public class SdyProject : ModelObject
         #endregion
         etpDoc.AppendChild(projectXML);
 
-        etpDoc.Save(Path.Combine(folderPath, Name + ".etp"));
+        // etpDoc.Save(Path.Combine(folderPath, Name + ".etp"));
 
         return etpDoc;
     }

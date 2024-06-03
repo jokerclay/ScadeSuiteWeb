@@ -3,13 +3,6 @@ using ScadeSuiteWeb.Server.Models.ProjectModel;
 using ScadeSuiteWeb.Shared.Utils;
 using ScadeSuiteWeb.Shared.ViewModels.PorjectModel;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using JsonSerializer = System.Text.Json.JsonSerializer;
-
-
-using static Microsoft.FluentUI.AspNetCore.Components.Emojis.FoodDrink.Color.Default;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ScadeSuiteWeb.Server.Controllers
 {
@@ -17,7 +10,6 @@ namespace ScadeSuiteWeb.Server.Controllers
     [ApiController]
     public class ModelFolderController : ControllerBase
     {
-
         [HttpGet]
         [Route("GetModelFolderInfo")]
         public async Task<ResponResult<IEnumerable<ProjectsSimpleInfoVM>>> GetModelFolderInfo()
@@ -62,7 +54,8 @@ namespace ScadeSuiteWeb.Server.Controllers
         }
 
 
-        [HttpGet(Name = "LoadModel")]
+        [HttpGet]
+        [Route("LoadModel")]
         public async Task<ResponResult<string>> LoadModel(int id)
         {
             var resourcesFilePath = CommonHelper.SystemResourcesFilePath;
@@ -93,5 +86,96 @@ namespace ScadeSuiteWeb.Server.Controllers
                 Success = false,
             };
         }
+
+        [HttpPost]
+        [Route("CreateNewFolder")]
+        public ResponResult<bool> CreateNewFolder(string folderName, string extensions, int id)
+        {
+            
+            string filePath = "";
+            SdyFolder newFolder = new SdyFolder()
+            {
+                Id = 69,
+                Name = folderName,
+                Extensions = extensions,
+            };
+
+            // find the project that are currently editing
+            var resourcesFilePath = CommonHelper.SystemResourcesFilePath;
+            var modelFilePath = Path.Combine(resourcesFilePath, "SuiteModels");
+            string[] subfolders = Directory.GetDirectories(modelFilePath);
+
+            SdyProject pj = new SdyProject();
+
+            for (int i = 0; i < subfolders.Length; ++i)
+            {
+                if (i == id)
+                {
+                    filePath = subfolders[i] + "\\ABC_N.etp";
+                    if (pj.LoadProjectFile(filePath))
+                    {
+                        // add a new folder to the root of the project
+                        pj.Project.Roots.Add(newFolder);
+                        // save the project back to xml file
+                        var doc = pj.ToXML();
+                        doc.Save(filePath);
+                        return new ResponResult<bool>
+                        {
+                            Success = true,
+                            Message = "New Folder Created."
+                        };
+                    }
+                    else
+                    {
+                        
+                        return new ResponResult<bool>
+                        {
+                            Success = false,
+                            Message = "ERROR: Could not Parse the Project File."
+                        };
+                    }
+                }
+            }
+            
+            return new ResponResult<bool>
+            {
+                Success = false,
+            };
+        }
+
+
+        
+        /*
+        [HttpPost(Name = "CreateNewFile")]
+        public async Task<ResponResult<bool>> CreateNewFile(int id)
+        {
+            return new ResponResult<bool>
+            {
+                Success = false,
+            };
+        }
+        */
+
+
+
+
+
+        /*
+
+
+        newFolder.Elements.Add(new SdyFileRef()
+        {
+            Id = 69,
+            PersistAs = "hahagetyou"
+        });
+        */
+    
+        
+        
+        
+        
+        
+        
+        
     }
 }
