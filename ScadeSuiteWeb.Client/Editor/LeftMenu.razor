@@ -2,35 +2,20 @@
 @using ScadeSuiteWeb.Shared.ViewModels.PorjectModel
 @inject IDialogService _dialogService
 
-<FluentTreeView @bind-CurrentSelected=currentSelected OnExpandedChange="HandleOnExpandedChanged">
-
+<FluentTreeView @bind-CurrentSelected="currentSelected" OnExpandedChange="HandleOnExpandedChanged">
     @if (Project != null)
     {
-        <FluentTreeItem Id="myId4"  Text="@ProjectName">
-            @foreach (var item in Project.Roots)
+        <FluentTreeItem Id="myId4" Text="@ProjectName">
+            @foreach (var rootItem in Project.Roots)
             {
-                <FluentTreeItem Text="@item.Name" >
-                        <FluentIcon Value="@(new Icons.Regular.Size20.Folder())" Color="@Color.Neutral" Slot="start" />
-                        @*
-                        <FluentIcon Value="@(new Icons.Regular.Size20.FolderOpen())" Color="@Color.Neutral" Slot="start" />
-                        *@
-                    @if (item is SdyFolder folder)
-                    {
-                        foreach (var obj in folder.Elements)
-                        {
-                            if (obj is SdyFileRef fileRef)
-                            {
-                                <FluentTreeItem Text="@fileRef.PersistAs">
-                                    <FluentIcon Value="@(new Icons.Regular.Size20.Document())" Color="@Color.Neutral" Slot="start"/>
-                                </FluentTreeItem>
-                            }
-                        }
-                    }
-                </FluentTreeItem>
+                <TreeItem TItem="SdyElement" Item="rootItem" />
             }
         </FluentTreeItem>
     }
 </FluentTreeView>
+
+
+
 
 <p>Current selected tree item is @currentSelected?.Text</p>
 <p>Most recently expanded/collapsed tree item is @currentAffected?.Text</p>
@@ -148,7 +133,6 @@
                                                                                        Multiple="true"
                                                                                        MaximumFileCount="4"
                                                                                        MaximumFileSize="@(10*1024*1024)"
-                                                                                       Accept="image/*"
                                                                                        @bind-ProgressPercent="@ProgressPercent"
                                                                                        OnCompleted="@OnCompletedAsync"
                                                                                        Style="height: 300px; border: 1px dashed red;">
@@ -156,18 +140,12 @@
                                                                               <label for="my-file-uploader">
                                                                                   <FluentIcon Value="@(new @Icons.Regular.Size24.ArrowUpload())" />
                                                                               </label>
-                                                                      
                                                                               <div>
                                                                                   Drag files here you wish to upload,
                                                                                   or <label for="my-file-uploader">browse</label>
                                                                                   for them<span style="color: red;">*</span>.
                                                                                   <br />
                                                                                   <em>Maximum of 4 files allowed.</em>
-                                                                              </div>
-                                                                      
-                                                                              <div>
-                                                                                  <br />
-                                                                                  <a href="#">Read more about our supported file formats.</a>
                                                                               </div>
                                                                           </ChildContent>
                                                                       </FluentInputFile>

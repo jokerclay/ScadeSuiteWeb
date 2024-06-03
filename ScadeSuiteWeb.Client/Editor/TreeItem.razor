@@ -1,0 +1,26 @@
+﻿@typeparam TItem
+
+@if (Item is SdyFolder folder)
+{
+    <FluentTreeItem Text="@folder.Name">
+        <FluentIcon Value="@(new Icons.Regular.Size20.Folder())" Color="@Color.Neutral" Slot="start" />
+        @foreach (var subItem in folder.Elements)
+        {
+            if (subItem is SdyFolder || subItem is SdyFileRef)
+            {
+                <TreeItem TItem="object" Item="subItem" />
+            }
+        }
+    </FluentTreeItem>
+}
+else if (Item is SdyFileRef fileRef)
+{
+    <FluentTreeItem Text="@fileRef.PersistAs">
+        <FluentIcon Value="@(new Icons.Regular.Size20.Document())" Color="@Color.Neutral" Slot="start"/>
+    </FluentTreeItem>
+}
+
+@code {
+    [Parameter]
+    public TItem Item { get; set; }
+}

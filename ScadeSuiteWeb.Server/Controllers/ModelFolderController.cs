@@ -89,15 +89,14 @@ namespace ScadeSuiteWeb.Server.Controllers
 
         [HttpPost]
         [Route("CreateNewFolder")]
-        public ResponResult<bool> CreateNewFolder(string folderName, string extensions, int id)
+        public ResponResult<bool> CreateNewFolder(string newFolderName, string newExtensions, int projectId)
         {
-            
             string filePath = "";
             SdyFolder newFolder = new SdyFolder()
             {
                 Id = 69,
-                Name = folderName,
-                Extensions = extensions,
+                Name = newFolderName,
+                Extensions = newExtensions,
             };
 
             // find the project that are currently editing
@@ -109,13 +108,15 @@ namespace ScadeSuiteWeb.Server.Controllers
 
             for (int i = 0; i < subfolders.Length; ++i)
             {
-                if (i == id)
+                if (i == projectId)
                 {
                     filePath = subfolders[i] + "\\ABC_N.etp";
                     if (pj.LoadProjectFile(filePath))
                     {
                         // add a new folder to the root of the project
-                        pj.Project.Roots.Add(newFolder);
+                        var selectedFolder = pj.Project.Roots;
+                        selectedFolder.Add(newFolder);
+                        
                         // save the project back to xml file
                         var doc = pj.ToXML();
                         doc.Save(filePath);
@@ -127,7 +128,6 @@ namespace ScadeSuiteWeb.Server.Controllers
                     }
                     else
                     {
-                        
                         return new ResponResult<bool>
                         {
                             Success = false,
@@ -144,38 +144,23 @@ namespace ScadeSuiteWeb.Server.Controllers
         }
 
 
-        
-        /*
-        [HttpPost(Name = "CreateNewFile")]
-        public async Task<ResponResult<bool>> CreateNewFile(int id)
+        [HttpPost]
+        [Route("CreateNewFile")]
+        public async Task<ResponResult<bool>> CreateNewFile( SdyFolder selectedFolder, int projectId)
         {
+            
+            
+            selectedFolder.Elements.Add(new SdyFileRef()
+            {
+                Id = 69,
+                PersistAs = "hahagetyou"
+            });
+            
             return new ResponResult<bool>
             {
                 Success = false,
             };
         }
-        */
 
-
-
-
-
-        /*
-
-
-        newFolder.Elements.Add(new SdyFileRef()
-        {
-            Id = 69,
-            PersistAs = "hahagetyou"
-        });
-        */
-    
-        
-        
-        
-        
-        
-        
-        
     }
 }
