@@ -2,7 +2,7 @@
 
 @if (Item is SdyFolder folder)
 {
-    <FluentTreeItem Text="@folder.Name">
+    <FluentTreeItem Text="@folder.Name" Data="Item as SdyFolder">
         <FluentIcon Value="@(new Icons.Regular.Size20.Folder())" Color="@Color.Neutral" Slot="start" />
         @foreach (var subItem in folder.Elements)
         {
@@ -15,7 +15,7 @@
 }
 else if (Item is SdyFileRef fileRef)
 {
-    <FluentTreeItem Text="@fileRef.PersistAs">
+    <FluentTreeItem Text="@fileRef.PersistAs" Data="Item as SdyFileRef">
         <FluentIcon Value="@(new Icons.Regular.Size20.Document())" Color="@Color.Neutral" Slot="start"/>
     </FluentTreeItem>
 }

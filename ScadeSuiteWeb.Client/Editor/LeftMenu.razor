@@ -2,10 +2,14 @@
 @using ScadeSuiteWeb.Shared.ViewModels.PorjectModel
 @inject IDialogService _dialogService
 
-<FluentTreeView @bind-CurrentSelected="currentSelected" OnExpandedChange="HandleOnExpandedChanged">
+<FluentTreeView
+    @bind-CurrentSelected="currentSelected"
+    OnExpandedChange="HandleOnExpandedChanged"
+    OnSelectedChange ="HandleOnSelectedChanged">
+    
     @if (Project != null)
     {
-        <FluentTreeItem Id="myId4" Text="@ProjectName">
+        <FluentTreeItem Id="myId4" Text="@ProjectName" >
             @foreach (var rootItem in Project.Roots)
             {
                 <TreeItem TItem="SdyElement" Item="rootItem" />
@@ -13,9 +17,6 @@
         </FluentTreeItem>
     }
 </FluentTreeView>
-
-
-
 
 <p>Current selected tree item is @currentSelected?.Text</p>
 <p>Most recently expanded/collapsed tree item is @currentAffected?.Text</p>
@@ -40,7 +41,6 @@
 
     [Parameter]
     public string? ProjectName { get; set; }
-
 
     bool FlowersExpanded = true;
     bool PlanesExpanded = true;
@@ -81,6 +81,11 @@
 
     private void OnMenuChange(MenuChangeEventArgs args)
     {
+        Console.WriteLine(currentSelected?.Data);
+        Console.WriteLine(currentSelected?.Data);
+        Console.WriteLine(currentSelected?.Data);
+
+
         if (args.Value is not null)
         {
 
@@ -94,7 +99,7 @@
                     // TODO: create a new file
                     break;
                     
-                    default:
+                default:
                     break;
             }
             
@@ -194,5 +199,20 @@
         {
             await _dialogService.ShowSuccessAsync($"You entered: ", "Success");
         }
+    }
+
+    private void HandleOnSelectedChanged(FluentTreeItem item)
+    {
+        if (item.Data is SdyFolder folder)
+        {
+            Console.WriteLine(folder.Id);
+            Console.WriteLine(folder.Name);
+        }
+        
+        if (item.Data is SdyFileRef fileRef)
+        {
+            Console.WriteLine(fileRef.PersistAs);
+        }
+        
     }
 }
