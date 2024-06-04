@@ -210,17 +210,70 @@ namespace ScadeSuiteWeb.Server.Controllers
 
         [HttpPost]
         [Route("CreateNewFile")]
-        public async Task<ResponResult<bool>> CreateNewFile( SdyFolder selectedFolder, int projectId)
+        public async Task<ResponResult<CreateFileVm>> CreateNewFile(CreateFileVm createFileVm )
         {
-            
-            
+            string filePath = "";
+            var selectedElement = createFileVm.SelectedElement;
+
+            // find the project that are currently editing
+            var resourcesFilePath = CommonHelper.SystemResourcesFilePath;
+            var modelFilePath = Path.Combine(resourcesFilePath, "SuiteModels");
+            string[] subfolders = Directory.GetDirectories(modelFilePath);
+
+            SdyProject pj = new SdyProject();
+
+
+            for (int i = 0; i < subfolders.Length; ++i)
+            {
+                if (i == createFileVm.ProjectId)
+                {
+                    filePath = subfolders[i] + "\\ABC_N.etp";
+
+                    if (pj.LoadProjectFile(filePath))
+                    {
+                        if (selectedElement?.Class == "Folder")
+                        {
+                            var folder = GetFolder(selectedElement, pj);
+                            
+                            foreach (var f in createFileVm.FileNames)
+                            {
+                                folder.Elements.Add(new SdyFileRef()
+                                {
+                                    Id = 69,
+                                    PersistAs = "../"+f,
+                                });
+                            }
+                            var doc = pj.ToXML();
+                            doc.Save(filePath);
+                            return new ResponResult<CreateFileVm>
+                            {
+                                Success = true,
+                                Message = "ERROR: Failed to load project file."
+                            };
+                        }
+                    }
+                    else
+                    {
+                        return new ResponResult<CreateFileVm>
+                        {
+                            Success = false,
+                            Message = "ERROR: Failed to load project file."
+                        };
+                    }
+
+                }
+            }
+
+            /*
             selectedFolder.Elements.Add(new SdyFileRef()
             {
                 Id = 69,
                 PersistAs = "hahagetyou"
             });
+
+            */
             
-            return new ResponResult<bool>
+            return new ResponResult<CreateFileVm>
             {
                 Success = false,
             };

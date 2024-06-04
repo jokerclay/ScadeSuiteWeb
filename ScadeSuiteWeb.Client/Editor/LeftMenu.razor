@@ -55,10 +55,22 @@
 
     private async Task<bool> ValidateCreation()
     {
-        if (String.IsNullOrEmpty(currentSelected?.Text ))
+        if (String.IsNullOrEmpty(currentSelected?.Text))
         {
             var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
-                                                                          <h1> Please select a folder to create a new folder or file </h1>
+                                                                          <h1> Please select a FOLDER to create a new folder or file </h1>
+                                                                      </div>
+            , new DialogParameters
+            {
+                Title = "Creating a New Folder",
+            });
+            return false;
+        }
+        
+        if (SelectedElement?.GetType().Name == "SdyFileRef" )
+        {
+            var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
+                                                                          <h1> Please select a FOLDER to create a new folder or file </h1>
                                                                       </div>
             , new DialogParameters
             {
@@ -67,6 +79,7 @@
             return false;
         }
         return true;
+        
     }
 
     private void HandleOnExpandedChanged(FluentTreeItem item)
@@ -176,22 +189,22 @@
                    }
                }
            }
-           // await _dialogService.ShowSuccessAsync($"You entered:Folder Name: {folderName}, Folder Extension: {folerExtension}", "Success");
         }
     }
     
         FluentInputFileEventArgs[] Files = Array.Empty<FluentInputFileEventArgs>();
         int ProgressPercent = 0;
+        List<string> fileNames = new List<string>();
+        
         private async Task OnCompletedAsync(IEnumerable<FluentInputFileEventArgs> files)
         {
             Files = files.ToArray();
-
             // For the demo, delete these files.
             foreach (var file in Files)
             {
-                file.LocalFile?.Delete();
+                fileNames.Add(file.Name);
             }
-
+            
             // Wait 3 seconds before to reset the progress bar.
             await Task.Delay(3000);
             ProgressPercent = 0;
@@ -200,10 +213,10 @@
     
     private async Task CreateNewFile(MouseEventArgs e)
     {
+        if (!await ValidateCreation()) return;
         Console.WriteLine($"{e}New File");
         var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
                                                                       <FluentInputFile Id="my-file-uploader"
-                                                                                       Mode="InputFileMode.SaveToTemporaryFolder"
                                                                                        Multiple="true"
                                                                                        MaximumFileCount="4"
                                                                                        MaximumFileSize="@(10*1024*1024)"
@@ -248,7 +261,49 @@
         var result = await dialogInstance.Result;
         if (!result.Cancelled)
         {
-            await _dialogService.ShowSuccessAsync($"You entered: ", "Success");
+            CreateFileVm newFile = new CreateFileVm();
+            
+            var res = await Http.GetFromJsonAsync<ResponResult<IEnumerable<ProjectsSimpleInfoVM>>>("https://localhost:7061/api/ModelFolder/GetModelFolderInfo");
+
+            if (res != null)
+            {
+                if (res.Success)
+                {
+                    if (res.Data != null) ProjectSimpleInfoData = res.Data;
+                }
+            }
+            if (ProjectSimpleInfoData != null)
+            {
+                foreach (var item in ProjectSimpleInfoData)
+                {
+                    if (Project != null && item.Name == Project.Name)
+                    {
+                        newFile .ProjectId = item.Id;
+                        newFile.FileNames = fileNames;
+                        newFile.SelectedElement = SelectedElement;
+                    }
+                }
+            }
+            
+            if (fileNames.Count > 0)
+            {
+                var httpResponse = await Http.PostAsJsonAsync($"https://localhost:7061/api/ModelFolder/CreateNewFile",newFile);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    if (SelectedElement != null)
+                    {
+                        var folder = (SdyFolder)SelectedElement;
+                        foreach (var filename in fileNames)
+                        {
+                            folder.Elements.Add(new SdyFileRef() { PersistAs = filename });
+                        }
+                    }
+                }
+                
+            }
+            
+            // await _dialogService.ShowSuccessAsync($"You entered:3748 ", "Success");
         }
     }
 
