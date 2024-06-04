@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Xml;
+using Microsoft.AspNetCore.Mvc;
 using ScadeSuiteWeb.Server.Models.ProjectModel;
 using ScadeSuiteWeb.Shared.Utils;
 using ScadeSuiteWeb.Shared.ViewModels.PorjectModel;
@@ -89,59 +90,109 @@ namespace ScadeSuiteWeb.Server.Controllers
 
         [HttpPost]
         [Route("CreateNewFolder")]
-        public ResponResult<bool> CreateNewFolder(string newFolderName, string newExtensions, int projectId)
+        public ResponResult<CreateFolderVm> CreateNewFolder( [FromBody] CreateFolderVm createFolderVm)
         {
             string filePath = "";
-            SdyFolder newFolder = new SdyFolder()
-            {
-                Id = 69,
-                Name = newFolderName,
-                Extensions = newExtensions,
-            };
+            var selectedElement = createFolderVm.SelectedElement;
 
             // find the project that are currently editing
             var resourcesFilePath = CommonHelper.SystemResourcesFilePath;
             var modelFilePath = Path.Combine(resourcesFilePath, "SuiteModels");
             string[] subfolders = Directory.GetDirectories(modelFilePath);
 
+            var newfolder = new SdyFolder();
             SdyProject pj = new SdyProject();
 
             for (int i = 0; i < subfolders.Length; ++i)
             {
-                if (i == projectId)
+                if (i == createFolderVm.ProjectId)
                 {
                     filePath = subfolders[i] + "\\ABC_N.etp";
+
                     if (pj.LoadProjectFile(filePath))
                     {
-                        // add a new folder to the root of the project
-                        var selectedFolder = pj.Project.Roots;
-                        selectedFolder.Add(newFolder);
+                        if (selectedElement?.Class=="Folder")
+                        {
+                            var folder = GetFolder(selectedElement, pj);
+                            
+                            newfolder = new SdyFolder()
+                            {
+                                Id = folder.Id+1,
+                                Name = createFolderVm.FolderName,
+                                Extensions = createFolderVm.FolderExtension,
+                            };
+                            
+                            folder.Elements.Add(newfolder);
+                            
+                            Console.WriteLine(folder);
+                            
+                        }
+
+                        if (selectedElement?.Class == "FileRef")
+                        {
+                            var folder = GetFolder(selectedElement, pj);
+                            Console.WriteLine(folder);
+                        }
                         
-                        // save the project back to xml file
                         var doc = pj.ToXML();
                         doc.Save(filePath);
-                        return new ResponResult<bool>
+                        var data = new CreateFolderVm();
+                        
+                        data.SelectedElement = newfolder;
+                        return new ResponResult<CreateFolderVm>
                         {
                             Success = true,
-                            Message = "New Folder Created."
+                            Data = data
                         };
                     }
                     else
                     {
-                        return new ResponResult<bool>
+                        return new ResponResult<CreateFolderVm>
                         {
                             Success = false,
-                            Message = "ERROR: Could not Parse the Project File."
+                            Message = "ERROR: Failed to load project file."
                         };
                     }
+                    
                 }
             }
-            
-            return new ResponResult<bool>
+            return new ResponResult<CreateFolderVm>
             {
                 Success = false,
             };
         }
+
+        
+        private SdyFolder GetFolder(SdyElement selectedElement, SdyProject pj)
+        {
+            return FindFolderRecursive(pj.Project.Roots, selectedElement);
+        }
+        
+        private SdyFolder FindFolderRecursive(List<SdyElement> folders, SdyElement selectedElement)
+        {
+            foreach (var folder in folders)
+            {
+                if (folder is SdyFolder sdyFolder)
+                {
+                    // Check if the current folder matches the selected element
+                    if (sdyFolder.Name == selectedElement.Name)
+                    {
+                        return sdyFolder;
+                    }
+
+                    // Recursively search in the subfolders
+                    var result = FindFolderRecursive(sdyFolder.Elements, selectedElement);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+            }
+            // If no matching folder is found, return null
+            return null;
+        }
+        
+        
 
 
         [HttpPost]

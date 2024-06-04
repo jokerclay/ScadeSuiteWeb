@@ -1,6 +1,8 @@
 ﻿@using System.Diagnostics.CodeAnalysis
+@using ScadeSuiteWeb.Shared.Utils
 @using ScadeSuiteWeb.Shared.ViewModels.PorjectModel
 @inject IDialogService _dialogService
+@inject HttpClient Http
 
 <FluentTreeView
     @bind-CurrentSelected="currentSelected"
@@ -9,8 +11,8 @@
     
     @if (Project != null)
     {
-        <FluentTreeItem Id="myId4" Text="@ProjectName" >
-            @foreach (var rootItem in Project.Roots)
+        <FluentTreeItem Id="myId4" Text="@Project.Name" >
+            @foreach (var rootItem in Project.Project.Roots)
             {
                 <TreeItem TItem="SdyElement" Item="rootItem" />
             }
@@ -37,10 +39,7 @@
     public double NewSize { get; set; }
 
     [Parameter]
-    public SdyConfiguration? Project { get; set; }
-
-    [Parameter]
-    public string? ProjectName { get; set; }
+    public SdyProject? Project { get; set; }
 
     bool FlowersExpanded = true;
     bool PlanesExpanded = true;
@@ -106,7 +105,18 @@
         }
     }
     
+    public SdyElement? SelectedElement { get;set; }
+    private void HandleOnSelectedChanged(FluentTreeItem item)
+    {
+        SelectedElement = item.Data as SdyElement;
+    }
+    
+    
+    private static IQueryable<ProjectsSimpleInfoVM>? projectsSimpleInfoVms { get; set; }
+    private IEnumerable <ProjectsSimpleInfoVM>? ProjectSimpleInfoData { get; set; }
+    
     private async Task CreateNewFolder(MouseEventArgs e)
+    
     {
         if (!await ValidateCreation()) return;
         
@@ -125,7 +135,41 @@
         var result = await dialogInstance.Result;
         if (!result.Cancelled)
         {
-            await _dialogService.ShowSuccessAsync($"You entered:Folder Name: {folderName}, Folder Extension: {folerExtension}", "Success");
+            var res = await Http.GetFromJsonAsync<ResponResult<IEnumerable<ProjectsSimpleInfoVM>>>("https://localhost:7061/api/ModelFolder/GetModelFolderInfo");
+
+            if (res != null)
+            {
+                if (res.Success)
+                {
+                    if (res.Data != null) ProjectSimpleInfoData = res.Data;
+                }
+            }
+            
+            var newFolder = new CreateFolderVm();
+            if (ProjectSimpleInfoData != null)
+            {
+                foreach (var item in ProjectSimpleInfoData)
+                {
+                    if (Project != null && item.Name == Project.Name)
+                    {
+                        newFolder.ProjectId = item.Id;
+                        newFolder.FolderName = folderName;
+                        newFolder.FolderExtension = folerExtension;
+                        newFolder.SelectedElement = SelectedElement;
+                    }
+                }
+            }
+           var httpResponse = await Http.PostAsJsonAsync($"https://localhost:7061/api/ModelFolder/CreateNewFolder", newFolder);
+
+           if (httpResponse.IsSuccessStatusCode)
+           {
+               if (SelectedElement != null)
+               {
+                   var folder = (SdyFolder)SelectedElement;
+                   folder.Elements.Add(new SdyFolder() { Name = folderName, Extensions = folerExtension });
+               }
+           }
+           // await _dialogService.ShowSuccessAsync($"You entered:Folder Name: {folderName}, Folder Extension: {folerExtension}", "Success");
         }
     }
     
@@ -201,18 +245,4 @@
         }
     }
 
-    private void HandleOnSelectedChanged(FluentTreeItem item)
-    {
-        if (item.Data is SdyFolder folder)
-        {
-            Console.WriteLine(folder.Id);
-            Console.WriteLine(folder.Name);
-        }
-        
-        if (item.Data is SdyFileRef fileRef)
-        {
-            Console.WriteLine(fileRef.PersistAs);
-        }
-        
-    }
 }

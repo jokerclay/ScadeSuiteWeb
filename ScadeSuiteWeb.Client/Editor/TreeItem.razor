@@ -2,16 +2,16 @@
 
 @if (Item is SdyFolder folder)
 {
-    <FluentTreeItem Text="@folder.Name" Data="Item as SdyFolder">
-        <FluentIcon Value="@(new Icons.Regular.Size20.Folder())" Color="@Color.Neutral" Slot="start" />
-        @foreach (var subItem in folder.Elements)
-        {
-            if (subItem is SdyFolder || subItem is SdyFileRef)
+        <FluentTreeItem Text="@folder.Name" Data="Item as SdyFolder">
+            <FluentIcon Value="@(new Icons.Regular.Size20.Folder())" Color="@Color.Neutral" Slot="start" />
+            @foreach (var subItem in folder.Elements)
             {
-                <TreeItem TItem="object" Item="subItem" />
+                if (subItem is SdyFolder || subItem is SdyFileRef)
+                {
+                    <TreeItem TItem="object" Item="subItem" />
+                }
             }
-        }
-    </FluentTreeItem>
+        </FluentTreeItem>
 }
 else if (Item is SdyFileRef fileRef)
 {
