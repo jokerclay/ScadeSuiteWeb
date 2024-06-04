@@ -1,5 +1,6 @@
 ﻿using System.Xml;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FluentUI.AspNetCore.Components;
 using ScadeSuiteWeb.Server.Models.ProjectModel;
 using ScadeSuiteWeb.Shared.Utils;
 using ScadeSuiteWeb.Shared.ViewModels.PorjectModel;
@@ -113,21 +114,32 @@ namespace ScadeSuiteWeb.Server.Controllers
                     {
                         if (selectedElement?.Class=="Folder")
                         {
-                            var folder = GetFolder(selectedElement, pj);
-                            
-                            newfolder = new SdyFolder()
+                            if (selectedElement.Name == "Root")
                             {
-                                Id = folder.Id+1,
-                                Name = createFolderVm.FolderName,
-                                Extensions = createFolderVm.FolderExtension,
-                            };
+                                newfolder = new SdyFolder()
+                                {
+                                    Id = selectedElement.Id+1,
+                                    Name = createFolderVm.FolderName,
+                                    Extensions = createFolderVm.FolderExtension,
+                                };
+                                pj.Project.Roots.Add(newfolder);
+                            }
+                            else
+                            {
+                                var folder = GetFolder(selectedElement, pj);
                             
-                            folder.Elements.Add(newfolder);
+                                newfolder = new SdyFolder()
+                                {
+                                    Id = folder.Id+1,
+                                    Name = createFolderVm.FolderName,
+                                    Extensions = createFolderVm.FolderExtension,
+                                };
                             
-                            Console.WriteLine(folder);
-                            
+                                folder.Elements.Add(newfolder);
+                                
+                            }
                         }
-
+                        
                         if (selectedElement?.Class == "FileRef")
                         {
                             var folder = GetFolder(selectedElement, pj);
@@ -165,6 +177,7 @@ namespace ScadeSuiteWeb.Server.Controllers
         
         private SdyFolder GetFolder(SdyElement selectedElement, SdyProject pj)
         {
+            
             return FindFolderRecursive(pj.Project.Roots, selectedElement);
         }
         

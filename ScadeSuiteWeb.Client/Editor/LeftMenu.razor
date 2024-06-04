@@ -11,7 +11,7 @@
     
     @if (Project != null)
     {
-        <FluentTreeItem Id="myId4" Text="@Project.Name" >
+        <FluentTreeItem Id="myId4" Text="@Project.Name" Data="@root">
             @foreach (var rootItem in Project.Project.Roots)
             {
                 <TreeItem TItem="SdyElement" Item="rootItem" />
@@ -40,7 +40,9 @@
 
     [Parameter]
     public SdyProject? Project { get; set; }
-
+    
+    public SdyFolder? root = new SdyFolder() { Name = "Root"};
+    
     bool FlowersExpanded = true;
     bool PlanesExpanded = true;
     bool DaisySelected = false;
@@ -167,6 +169,11 @@
                {
                    var folder = (SdyFolder)SelectedElement;
                    folder.Elements.Add(new SdyFolder() { Name = folderName, Extensions = folerExtension });
+                   
+                    if (Project != null && SelectedElement.Name == "Root")
+                   {
+                       Project.Project.Roots.Add(new SdyFolder() { Name = folderName, Extensions = folerExtension });
+                   }
                }
            }
            // await _dialogService.ShowSuccessAsync($"You entered:Folder Name: {folderName}, Folder Extension: {folerExtension}", "Success");
