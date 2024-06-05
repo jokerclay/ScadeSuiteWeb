@@ -44,14 +44,14 @@
                             foreach (var inputNode in node.Inputs)
                             {
                                 <FluentTreeItem Text="@inputNode.Name">
-                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleLeft())" Color="@Color.Neutral" Slot="start"/>
+                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleLeft())" Color="@Color.Neutral" Slot="start" Data="@inputNode"/>
                                 </FluentTreeItem>
                             }
 
                             foreach (var outputNode in node.Outputs)
                             {
                                 <FluentTreeItem Text="@outputNode.Name">
-                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleRight())" Color="@Color.Neutral" Slot="start"/>
+                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleRight())" Color="@Color.Neutral" Slot="start" Data="@outputNode"/>
                                 </FluentTreeItem>
                             }
                         }
@@ -83,7 +83,6 @@
     </FluentMenuItem > 
 </FluentMenu>
 
-@*
 <FluentMenu Anchor="nodesEditor" Trigger="MouseButton.Right" Anchored="false" @onmenuchange=OnModelViewMenuChange >
     <FluentMenuItem Label="Add Node">
         <MenuItems>
@@ -93,7 +92,6 @@
     </FluentMenuItem>
     <FluentMenuItem Label="Delete Node" OnClick="@DeleteNode"/>
 </FluentMenu>
-*@
 
 
 <p>@status</p>
@@ -456,58 +454,128 @@
     #region node editor
     
     
-    @*
     private async Task AddInputNode (MouseEventArgs e)
     {
-        if (!await ValidateCreation()) return;
-        var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
-                                                                  </div>
-            , new DialogParameters
-            {
-                Title = "Add Input Node",
-            });
+        // if (!await ValidateCreation()) return;
 
-        var result = await dialogInstance.Result;
-        if (!result.Cancelled)
+
+        string inputName = string.Empty;
+        string inputType = string.Empty;
+        if (currentSelectedModelView != null)
         {
+            var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
+                                                                          <FluentTextField @bind-Value=inputName   Label="Folder Name:" />
+                                                                          <FluentTextField @bind-Value=inputType   Label="Folder Extension:" />
+                                                                      </div>
+                , new DialogParameters
+                {
+                    Title = "Creating a New Input",
+                });
+
+            var result = await dialogInstance.Result;
+            if (!result.Cancelled)
+            {
+                SSInput input = new()
+                {
+                    Name = inputName,
+                    DataType = inputType,
+                    Comment = "",
+                    RequirementID = new()
+                };
+                if (modelPj != null)
+                    foreach (var item in modelPj.Nodes)
+                    {
+                        item.Inputs.Add(input);
+                    }
+            }
         }
+
     }
     
     private async Task AddOutputNode(MouseEventArgs e)
     {
-        if (!await ValidateCreation()) return;
-        var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
-                                                                  </div>
-            , new DialogParameters
-            {
-                Title = "Add Output Node",
-            });
-
-        var result = await dialogInstance.Result;
-        if (!result.Cancelled)
+        // if (!await ValidateCreation()) return;
+        
+        string outputName = string.Empty;
+        string outputType = string.Empty;
+        if (currentSelectedModelView != null)
         {
-            
+            var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
+                                                                          <FluentTextField @bind-Value=outputName    Label="outputName:" />
+                                                                          <FluentTextField @bind-Value=outputType     Label="outputType:" />
+                                                                      </div>
+                , new DialogParameters
+                {
+                    Title = "Creating a New Output",
+                }); 
+            var result = await dialogInstance.Result;
+            if (!result.Cancelled)
+            {
+                SSInput input = new()
+                {
+                    Name = outputName,
+                    DataType = outputType,
+                    Comment = "",
+                    RequirementID = new()
+                };
+                if (modelPj != null)
+                    foreach (var item in modelPj.Nodes)
+                    {
+                        item.Inputs.Add(input);
+                    }
+            }
         }
+        
     }
     
-    private async Task DeleteNode(MouseEventArgs e)
+    private void DeleteNode(MouseEventArgs e)
     {
-        if (!await ValidateCreation()) return;
-        var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
-                                                                  </div>
-            , new DialogParameters
-            {
-                Title = "delete node",
-            });
-
-        var result = await dialogInstance.Result;
-        if (!result.Cancelled)
+        // if (!await ValidateCreation()) return;
+        if (currentSelectedModelView != null)
         {
+            var nodeName = currentSelectedModelView.Text;
+
+            if (modelPj != null)
+            {
+                var inputsToRemove = new List<SSInput>();
+                var outputsToRemove = new List<SSOutput>();
+
+                foreach (var item in modelPj.Nodes)
+                {
+                    foreach (var input in item.Inputs)
+                    {
+                        if (input.Name == nodeName)
+                        {
+                            inputsToRemove.Add(input);
+                        }
+                    }
+
+                    foreach (var output in item.Outputs)
+                    {
+                        if (output.Name == nodeName)
+                        {
+                            outputsToRemove.Add(output);
+                        }
+                    }
+                }
+
+                // Remove the inputs and outputs after iteration
+                foreach (var item in modelPj.Nodes)
+                {
+                    foreach (var input in inputsToRemove)
+                    {
+                        item.Inputs.Remove(input);
+                    }
+
+                    foreach (var output in outputsToRemove)
+                    {
+                        item.Outputs.Remove(output);
+                    }
+                }
+            }
         }
+
     }
-    *@
-    
-    
     
     #endregion
     

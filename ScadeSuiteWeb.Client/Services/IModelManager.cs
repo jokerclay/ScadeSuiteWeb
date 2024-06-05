@@ -19,7 +19,11 @@ namespace ScadeSuiteWeb.Client.Services;
         /// 新建项目
         /// </summary>
         /// <returns></returns>
+        
         public SSModel NewProject();
+
+
+        public SSModel DeleteNode(string nodeName);
     }
     public class ModelManager : IModelManager
     {
@@ -108,6 +112,29 @@ namespace ScadeSuiteWeb.Client.Services;
             foreach (var item in Project.Nodes)
             {
                 item.Outputs.Add(output);
+            }
+            return Project;
+        }
+        
+        public SSModel DeleteNode(string nodeName)
+        {
+            foreach (var item in Project.Nodes)
+            {
+                foreach (var input in item.Inputs)
+                {
+                    if (input.Name == nodeName)
+                    {
+                        item.Inputs.Remove(input);
+                    }
+                }
+                
+                foreach (var output in item.Outputs)
+                {
+                    if (output.Name == nodeName)
+                    {
+                        item.Outputs.Remove(output);
+                    }
+                }
             }
             return Project;
         }
