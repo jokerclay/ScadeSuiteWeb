@@ -2,12 +2,23 @@
 <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: start; ">
     
     <h4>Properties</h4>
-    <FluentTextField @bind-Value=value5 ReadOnly="true">dafasf</FluentTextField>
+    @if (SelectedElement is SdyFolder folder)
+    {
+        
+    <FluentTextField @bind-Value=folder.Name ReadOnly="true">folder name</FluentTextField>
     <br>
-    <FluentTextField  @bind-Value=value6 ReadOnly="true">label</FluentTextField>
-
+    <FluentTextField  @bind-Value=folder.Extensions ReadOnly="true">folder extension</FluentTextField>
+    }
+    
+    @if (SelectedElement is SdyFileRef fileRef)
+    {
+        <FluentTextField  @bind-Value=fileRef.PersistAs  ReadOnly="true">file PersistAs </FluentTextField>
+    }
 </div>
 
 @code {
+    [Parameter]
+    public SdyElement SelectedElement { get; set; }
+
     string?  value5="Read only", value6="Read only";
 }

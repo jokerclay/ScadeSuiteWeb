@@ -41,6 +41,9 @@
     [Parameter]
     public SdyProject? Project { get; set; }
     
+    [Parameter]
+    public EventCallback<SdyElement> OnElementSelected { get; set; }
+    
     public SdyFolder? root = new SdyFolder() { Name = "Root"};
     
     bool FlowersExpanded = true;
@@ -53,6 +56,10 @@
     FluentTreeItem? currentSelected;
     FluentTreeItem? currentAffected;
 
+    private void SelectElement(SdyElement element)
+    {
+        OnElementSelected.InvokeAsync(element);
+    }
     private async Task<bool> ValidateCreation()
     {
         if (String.IsNullOrEmpty(currentSelected?.Text))
@@ -124,6 +131,8 @@
     private void HandleOnSelectedChanged(FluentTreeItem item)
     {
         SelectedElement = item.Data as SdyElement;
+        // pass selected element to parent component
+        if (SelectedElement != null) SelectElement(SelectedElement);
     }
     
     

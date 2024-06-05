@@ -50,7 +50,7 @@
     <FluentMultiSplitterPane Size="15%" Min="50px" Max="70%">
         @if (Pj is not null)
         {
-            <LeftMenu Project="@Pj" />
+            <LeftMenu Project="@Pj"  OnElementSelected="OnElementSelected"  />
         }
     </FluentMultiSplitterPane>
 
@@ -96,7 +96,8 @@
 
     @* 右 panle index 2 *@
     <FluentMultiSplitterPane Size="20%">
-        <RightProperty />
+        <RightProperty SelectedElement="selectedElement" />
+         
     </FluentMultiSplitterPane>
 
 </FluentMultiSplitter>
@@ -216,5 +217,12 @@
                 Pj = new SdyProject(projectJson);
             }
         }
+    }
+    // -------------------------------------------------
+    private SdyElement selectedElement;
+
+    private void OnElementSelected(SdyElement element)
+    {
+        selectedElement = element;
     }
 }
