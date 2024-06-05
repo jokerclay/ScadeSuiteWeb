@@ -1,24 +1,78 @@
 ﻿@using System.Diagnostics.CodeAnalysis
+@using Newtonsoft.Json
+@using ParseSuite
+@using ScadeSuiteWeb.Client.Services
 @using ScadeSuiteWeb.Shared.Utils
 @using ScadeSuiteWeb.Shared.ViewModels.PorjectModel
 @inject IDialogService _dialogService
 @inject HttpClient Http
+@inject IModelManager ModelManager
 
-<FluentTreeView
-    @bind-CurrentSelected="currentSelected"
-    OnExpandedChange="HandleOnExpandedChanged"
-    OnSelectedChange ="HandleOnSelectedChanged">
-    
-    @if (Project != null)
-    {
-        <FluentTreeItem Id="myId4" Text="@Project.Name" Data="@root">
-            @foreach (var rootItem in Project.Project.Roots)
+
+<FluentTabs @bind-ActiveTabId="@activeid" OnTabChange="HandleOnTabChange">
+    <FluentTab Label="file view" Id="tab-1">
+        @* ---------------------------- file view ----------------------------  *@
+        <FluentTreeView
+            @bind-CurrentSelected="currentSelected"
+            OnExpandedChange="HandleOnExpandedChanged"
+            OnSelectedChange ="HandleOnSelectedChanged">
+            @if (Project != null)
             {
-                <TreeItem TItem="SdyElement" Item="rootItem" />
+                <FluentTreeItem Id="myId4" Text="@Project.Name" Data="@root">
+                    @foreach (var rootItem in Project.Project.Roots)
+                    {
+                        <TreeItem TItem="SdyElement" Item="rootItem" />
+                    }
+                </FluentTreeItem>
             }
-        </FluentTreeItem>
-    }
-</FluentTreeView>
+        </FluentTreeView>
+    </FluentTab>
+    
+    <FluentTab Label="model view" Id="tab-2">
+        
+        @* ---------------------------- model view ----------------------------  *@
+        <FluentTreeView
+            @bind-CurrentSelected="currentSelectedModelView"
+            OnExpandedChange="HandleOnExpandedChangedModelView"
+            OnSelectedChange ="HandleOnSelectedChangedModelView">
+            <FluentTreeItem Id="nodesEditor" Text="@(ModelManager.Project.Project + ".etp")">
+                <FluentTreeItem Text="Interface">
+                    @if (modelPj != null)
+                    {
+                        foreach (var node in modelPj.Nodes)
+                        {
+                            foreach (var inputNode in node.Inputs)
+                            {
+                                <FluentTreeItem Text="@inputNode.Name">
+                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleLeft())" Color="@Color.Neutral" Slot="start"/>
+                                </FluentTreeItem>
+                            }
+
+                            foreach (var outputNode in node.Outputs)
+                            {
+                                <FluentTreeItem Text="@outputNode.Name">
+                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleRight())" Color="@Color.Neutral" Slot="start"/>
+                                </FluentTreeItem>
+                            }
+                        }
+                    }
+                
+                </FluentTreeItem>
+            </FluentTreeItem>
+                
+        </FluentTreeView>
+        
+        
+    </FluentTab>
+
+</FluentTabs>
+
+<p>Active tab changed to: @changedto?.Label</p>
+
+@*
+<button @onclick="SwitchToFileView">file view</button> 
+<button @onclick="SwitchToModelView">model view</button>
+*@
 
 <p>Current selected tree item is @currentSelected?.Text</p>
 <p>Most recently expanded/collapsed tree item is @currentAffected?.Text</p>
@@ -28,6 +82,19 @@
     <FluentMenuItem  Label="New File" OnClick="@CreateNewFile" >
     </FluentMenuItem > 
 </FluentMenu>
+
+@*
+<FluentMenu Anchor="nodesEditor" Trigger="MouseButton.Right" Anchored="false" @onmenuchange=OnModelViewMenuChange >
+    <FluentMenuItem Label="Add Node">
+        <MenuItems>
+            <FluentMenuItem Label="Add Input Node" OnClick="@AddInputNode"/>
+            <FluentMenuItem Label="Add Output Node" OnClick="@AddOutputNode"/>
+        </MenuItems>
+    </FluentMenuItem>
+    <FluentMenuItem Label="Delete Node" OnClick="@DeleteNode"/>
+</FluentMenu>
+*@
+
 
 <p>@status</p>
 
@@ -54,7 +121,9 @@
 
 
     FluentTreeItem? currentSelected;
+    FluentTreeItem? currentSelectedModelView;
     FluentTreeItem? currentAffected;
+    FluentTreeItem? currentAffectedModelView;
 
     private void SelectElement(SdyElement element)
     {
@@ -97,6 +166,16 @@
             // var a = currentAffected.ChildContent;
         }
     }
+    
+    private void HandleOnExpandedChangedModelView(FluentTreeItem item)
+    {
+        currentAffectedModelView = item;
+        if (currentAffectedModelView.Expanded)
+        {
+            // var a = currentAffected.ChildContent;
+        }
+    }
+    
     // ------------------------------------------------------
     private string status = "";
 
@@ -126,7 +205,12 @@
             
         }
     }
-    
+
+    private void OnModelViewMenuChange(MenuChangeEventArgs args)
+    {
+        
+    }
+
     public SdyElement? SelectedElement { get;set; }
     private void HandleOnSelectedChanged(FluentTreeItem item)
     {
@@ -136,11 +220,21 @@
     }
     
     
+    private void HandleOnSelectedChangedModelView(FluentTreeItem item)
+    {
+        Console.WriteLine(item.Data);
+        
+        /*
+        SelectedElement = item.Data as SdyElement;
+        // pass selected element to parent component
+        if (SelectedElement != null) SelectElement(SelectedElement);
+        */
+    }
+    
     private static IQueryable<ProjectsSimpleInfoVM>? projectsSimpleInfoVms { get; set; }
     private IEnumerable <ProjectsSimpleInfoVM>? ProjectSimpleInfoData { get; set; }
     
     private async Task CreateNewFolder(MouseEventArgs e)
-    
     {
         if (!await ValidateCreation()) return;
         
@@ -316,4 +410,107 @@
         }
     }
 
+    
+    #region tabs
+    // ------------------------- tabs
+    public string Tab { get; set; } = "file";
+
+    private void SwitchToFileView()
+    {
+        Tab = "file";
+    }
+    private void SwitchToModelView()
+    {
+        Tab = "model";
+    }
+    
+    string? activeid = "tab-1";
+    
+    FluentTab? changedto;
+
+    public SSModel? modelPj { get; set; }
+    public List<SSNode> Nodes { get; set; }
+    
+    private void HandleOnTabChange(FluentTab tab)
+    {
+        changedto = tab;
+        if (tab.Id == "tab-2")
+        {
+            modelPj = ModelManager.NewProject();
+            
+            /*
+             
+            Nodes = modelPj.Nodes;
+            var json = JsonConvert.SerializeObject(Nodes );
+            Console.WriteLine(json);
+            */
+        }
+    }
+    
+    
+    
+    
+    #endregion
+    
+    
+    #region node editor
+    
+    
+    @*
+    private async Task AddInputNode (MouseEventArgs e)
+    {
+        if (!await ValidateCreation()) return;
+        var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
+                                                                  </div>
+            , new DialogParameters
+            {
+                Title = "Add Input Node",
+            });
+
+        var result = await dialogInstance.Result;
+        if (!result.Cancelled)
+        {
+        }
+    }
+    
+    private async Task AddOutputNode(MouseEventArgs e)
+    {
+        if (!await ValidateCreation()) return;
+        var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
+                                                                  </div>
+            , new DialogParameters
+            {
+                Title = "Add Output Node",
+            });
+
+        var result = await dialogInstance.Result;
+        if (!result.Cancelled)
+        {
+            
+        }
+    }
+    
+    private async Task DeleteNode(MouseEventArgs e)
+    {
+        if (!await ValidateCreation()) return;
+        var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
+                                                                  </div>
+            , new DialogParameters
+            {
+                Title = "delete node",
+            });
+
+        var result = await dialogInstance.Result;
+        if (!result.Cancelled)
+        {
+        }
+    }
+    *@
+    
+    
+    
+    #endregion
+    
 }
+
+

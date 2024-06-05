@@ -193,17 +193,14 @@ namespace ScadeSuiteWeb.Server.Controllers
                     {
                         return sdyFolder;
                     }
-
+                    
                     // Recursively search in the subfolders
                     var result = FindFolderRecursive(sdyFolder.Elements, selectedElement);
-                    if (result != null)
-                    {
-                        return result;
-                    }
+                    return result;
                 }
             }
             // If no matching folder is found, return null
-            return null;
+            return new SdyFolder();
         }
         
         

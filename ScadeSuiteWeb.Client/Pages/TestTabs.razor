@@ -1,0 +1,28 @@
+﻿@page "/TestTabs"
+
+<FluentTabs @bind-ActiveTabId="@activeid" OnTabChange="HandleOnTabChange">
+    
+    <FluentTab Label="Tab one" Icon="@(new Icons.Regular.Size24.LeafOne())" Id="tab-1">
+        dffffff
+    </FluentTab>
+    
+    <FluentTab Label="Tab two" Id="tab-2">
+        
+        dadfadfadf
+    </FluentTab>
+
+</FluentTabs>
+
+<p>Active tab changed to: @changedto?.Label</p>
+
+
+@code {
+    string? activeid = "tab-1";
+    FluentTab? changedto;
+
+    private void HandleOnTabChange(FluentTab tab)
+    {
+        changedto = tab;
+    }
+    
+}
