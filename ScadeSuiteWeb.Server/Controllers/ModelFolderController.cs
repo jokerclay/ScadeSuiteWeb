@@ -116,9 +116,10 @@ namespace ScadeSuiteWeb.Server.Controllers
                         {
                             if (selectedElement.Name == "Root")
                             {
+                                var folder = GetFolder(selectedElement, pj);
                                 newfolder = new SdyFolder()
                                 {
-                                    Id = selectedElement.Id+1,
+                                    Id = folder.Id+1,
                                     Name = createFolderVm.FolderName,
                                     Extensions = createFolderVm.FolderExtension,
                                 };
