@@ -23,7 +23,12 @@
     <FluentButton IconStart="@(new Icons.Regular.Size24.Info())" @onclick="OnOpen">
         About
     </FluentButton>
+    
+    <FluentHeader Style="background-color:#efefef; height: 90%; width: 60%; border-radius: 4px; border: 1px solid #ffffff;" >
+        <ToolBox/>
+    </FluentHeader>
 
+    
     <a href="swagger" target="_blank">
         <FluentIcon Color="Color.Info" Value="@(new Icons.Filled.Size20.BugArrowCounterclockwise())" />
         Debug
@@ -45,7 +50,7 @@
 <FluentMultiSplitter OnResize="@OnResizeHandler" Height="92vh" Style=" ">
 
     @* 左 panle index 0 *@
-    <FluentMultiSplitterPane Size="15%" Min="50px" Max="70%">
+    <FluentMultiSplitterPane Size="15%" Min="50px" Max="70%" Collapsible="true">
         @if (Pj is not null)
         {
             <LeftMenu Project="@Pj"  
@@ -74,7 +79,7 @@
     </FluentMultiSplitterPane>
 
     @* 右 panle index 2 *@
-    <FluentMultiSplitterPane Size="20%">
+    <FluentMultiSplitterPane Size="20%" Collapsible="true" >
         <RightProperty
             SelectedElement="selectedElement"
             SelectedInput="selectedInput"

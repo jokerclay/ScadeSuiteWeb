@@ -22,4 +22,8 @@
     <ProjectReference Include="..\ScadeSuiteWeb.Shared\ScadeSuiteWeb.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\math\" />
+  </ItemGroup>
+
 </Project>
