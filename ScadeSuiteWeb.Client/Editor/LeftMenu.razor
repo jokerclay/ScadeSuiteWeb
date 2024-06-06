@@ -35,7 +35,7 @@
             @bind-CurrentSelected="currentSelectedModelView"
             OnExpandedChange="HandleOnExpandedChangedModelView"
             OnSelectedChange ="HandleOnSelectedChangedModelView">
-            <FluentTreeItem Id="nodesEditor" Text="@(ModelManager.Project.Project + ".etp")">
+            <FluentTreeItem Id="nodesEditor" Text="@ProjectModelViewName" Data="modelPj">
                 <FluentTreeItem Text="Interface">
                     @if (modelPj != null)
                     {
@@ -115,6 +115,9 @@
     [Parameter]
     public EventCallback<SSOutput> OnOutputSelected { get; set; }
     
+    [Parameter]
+    public EventCallback<SSModel> OnProjectModelSelected { get; set; }
+    
     public SdyFolder? root = new SdyFolder() { Name = "Root"};
     
     bool FlowersExpanded = true;
@@ -142,6 +145,11 @@
     private void SelectOutput(SSOutput output)
     {
          OnOutputSelected.InvokeAsync(output);
+    }
+    
+    private void SelectProjectModel(SSModel model)
+    {
+         OnProjectModelSelected.InvokeAsync(model);
     }
     
     
@@ -182,7 +190,9 @@
             // var a = currentAffected.ChildContent;
         }
     }
-    
+
+    public string? ProjectModelViewName { get; set; }
+
     private void HandleOnExpandedChangedModelView(FluentTreeItem item)
     {
         currentAffectedModelView = item;
@@ -238,6 +248,7 @@
     
     public SdyElement? SelectedElement { get;set; }
     public SSInput? SelectedInput { get;set; }
+    public SSModel? SelectedProjectModel { get;set; }
     private void HandleOnSelectedChangedModelView(FluentTreeItem item)
     {
         if (item.Data is SSInput)
@@ -252,6 +263,11 @@
             if (SelectedOutput != null) SelectOutput(SelectedOutput);
         }
         
+        if (item.Text == ProjectModelViewName)
+        {
+            SelectedProjectModel = item.Data as SSModel;
+            if (SelectedProjectModel != null) SelectProjectModel(SelectedProjectModel );
+        }
     }
     
     private static IQueryable<ProjectsSimpleInfoVM>? projectsSimpleInfoVms { get; set; }
@@ -460,7 +476,7 @@
         if (tab.Id == "tab-2")
         {
             modelPj = ModelManager.NewProject();
-            
+            ProjectModelViewName = ModelManager.Project.Project + ".etp";
             /*
             Nodes = modelPj.Nodes;
             var json = JsonConvert.SerializeObject(Nodes );
