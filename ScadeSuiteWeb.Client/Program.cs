@@ -18,6 +18,7 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton<DragDropService>();
 
 builder.Services.AddScoped<IModelManager, ModelManager>();
 builder.Services.AddFluentUIComponents();

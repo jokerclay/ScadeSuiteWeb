@@ -11,6 +11,15 @@
 @inject HttpClient Http
 @inject IToastService ToastService
 
+@*
+
+ OnDragEnter="@(e => Console.WriteLine($"{e.Source.Id} is entered in  {e.Target.Id}"))"
+ OnDragLeave="@(e => Console.WriteLine($"{e.Source.Id} has left {e.Target.Id}"))"
+ OnDropEnd="@(e => Console.WriteLine($"{e.Source.Id} dropped in {e.Target.Id}"))"
+ 
+*@
+
+<FluentDragContainer TItem="string">
 <FluentHeader Style="height:5vh;background-color:#efefef;">
     <FluentButton IconStart="@(new Icons.Regular.Size24.FormNew())">
         New Project
@@ -24,7 +33,14 @@
         About
     </FluentButton>
     
-    <FluentHeader Style="background-color:#efefef; height: 90%; width: 60%; border-radius: 4px; border: 1px solid #ffffff;" >
+    <FluentHeader Style="background-color:#efefef; height: 90%; width: 60%; border-radius: 4px; border: 1px solid #ffffff;">
+        <FluentIcon Title="Plus" Value="@(Icon.FromImageUrl("images/math/Plus.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px" />
+        <FluentIcon Title="Minus"  Value="@(Icon.FromImageUrl("images/math/Minus.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px"/>
+        <FluentIcon Title="Multiplication" Value="@(Icon.FromImageUrl("images/math/Multiplication.png "))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px"/>
+        <FluentIcon Title="Polymorphic Division" Value="@(Icon.FromImageUrl("images/math/PolymorphicDivision.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px"/>
+        <FluentIcon Title="Modulo"   Value="@(Icon.FromImageUrl("images/math/Modulo.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px" />
+        <FluentIcon Title="Unary Minus"  Value="@(Icon.FromImageUrl("images/math/UnaryMinus.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px" />
+        <FluentIcon Title="Numerical Cast" Value="@(Icon.FromImageUrl("images/math/NumericalCast.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px" />
         <ToolBox/>
     </FluentHeader>
 
@@ -58,7 +74,7 @@
                       OnInputSelected="OnInputSelected"
                       OnOutputSelected="OnOutputSelected"
                       OnProjectModelSelected ="OnProjectModelSelected"
-                      />
+            />
         }
     </FluentMultiSplitterPane>
 
@@ -74,6 +90,18 @@
             
             <FluentMultiSplitterPane Size="30%" Collapsible="true">
                 Console log
+                
+                
+
+        <FluentDropZone Id="Item2" Draggable="true" Droppable="true">
+            <div style="width: 50px; height: 50px; background-color: lightgreen;">
+                Item 2
+            </div>
+        </FluentDropZone>
+                
+                
+                
+                
             </FluentMultiSplitterPane>
         </FluentMultiSplitter>
     </FluentMultiSplitterPane>
@@ -88,6 +116,8 @@
     </FluentMultiSplitterPane>
 
 </FluentMultiSplitter>
+
+</FluentDragContainer>
 
 <FluentFooter Style="height:3vh;background-color:#efefef;">
     Footer start text

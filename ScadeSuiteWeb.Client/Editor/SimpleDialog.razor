@@ -37,8 +37,11 @@
     public ProjectsSimpleInfoVM? Content { get; set; }
     
     
-    [CascadingParameter] public FluentDialog? Dialog { get; set; }
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+    
     private IEnumerable <ProjectsSimpleInfoVM>? ProjectSimpleInfoData { get; set; }
+    
     private static IQueryable<ProjectsSimpleInfoVM>? projectsSimpleInfoVms { get; set; }
 
     protected override async Task<Task> OnParametersSetAsync()
