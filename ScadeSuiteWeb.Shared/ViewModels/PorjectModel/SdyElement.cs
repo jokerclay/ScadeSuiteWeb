@@ -7,6 +7,8 @@ using Newtonsoft.Json.Linq;
 public class SdyElement : ModelObject
 {
     public List<SdyProp> Props { get; set; }
+    
+    public bool Actived { get; set; } = false;
 
     public SdyElement()
     {

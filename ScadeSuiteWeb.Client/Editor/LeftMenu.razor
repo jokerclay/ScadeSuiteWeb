@@ -43,15 +43,15 @@
                         {
                             foreach (var inputNode in node.Inputs)
                             {
-                                <FluentTreeItem Text="@inputNode.Name">
-                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleLeft())" Color="@Color.Neutral" Slot="start" Data="@inputNode"/>
+                                <FluentTreeItem Text="@inputNode.Name" Data="@inputNode">
+                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleLeft())" Color="@Color.Neutral" Slot="start"/>
                                 </FluentTreeItem>
                             }
 
                             foreach (var outputNode in node.Outputs)
                             {
-                                <FluentTreeItem Text="@outputNode.Name">
-                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleRight())" Color="@Color.Neutral" Slot="start" Data="@outputNode"/>
+                                <FluentTreeItem Text="@outputNode.Name" Data="@outputNode">
+                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleRight())" Color="@Color.Neutral" Slot="start"/>
                                 </FluentTreeItem>
                             }
                         }
@@ -109,6 +109,12 @@
     [Parameter]
     public EventCallback<SdyElement> OnElementSelected { get; set; }
     
+    [Parameter]
+    public EventCallback<SSInput> OnInputSelected { get; set; }
+    
+    [Parameter]
+    public EventCallback<SSOutput> OnOutputSelected { get; set; }
+    
     public SdyFolder? root = new SdyFolder() { Name = "Root"};
     
     bool FlowersExpanded = true;
@@ -127,6 +133,18 @@
     {
         OnElementSelected.InvokeAsync(element);
     }
+    
+    private void SelectInput(SSInput input)
+    {
+        OnInputSelected.InvokeAsync(input);
+    }
+
+    private void SelectOutput(SSOutput output)
+    {
+         OnOutputSelected.InvokeAsync(output);
+    }
+    
+    
     private async Task<bool> ValidateCreation()
     {
         if (String.IsNullOrEmpty(currentSelected?.Text))
@@ -209,7 +227,7 @@
         
     }
 
-    public SdyElement? SelectedElement { get;set; }
+    public SSOutput? SelectedOutput { get;set; }
     private void HandleOnSelectedChanged(FluentTreeItem item)
     {
         SelectedElement = item.Data as SdyElement;
@@ -218,15 +236,22 @@
     }
     
     
+    public SdyElement? SelectedElement { get;set; }
+    public SSInput? SelectedInput { get;set; }
     private void HandleOnSelectedChangedModelView(FluentTreeItem item)
     {
-        Console.WriteLine(item.Data);
+        if (item.Data is SSInput)
+        {
+            SelectedInput = item.Data as SSInput;
+            if (SelectedInput != null) SelectInput(SelectedInput);
+        }
+        if (item.Data is SSOutput)
+        {
+            SelectedOutput = item.Data as SSOutput;
+
+            if (SelectedOutput != null) SelectOutput(SelectedOutput);
+        }
         
-        /*
-        SelectedElement = item.Data as SdyElement;
-        // pass selected element to parent component
-        if (SelectedElement != null) SelectElement(SelectedElement);
-        */
     }
     
     private static IQueryable<ProjectsSimpleInfoVM>? projectsSimpleInfoVms { get; set; }
@@ -437,7 +462,6 @@
             modelPj = ModelManager.NewProject();
             
             /*
-             
             Nodes = modelPj.Nodes;
             var json = JsonConvert.SerializeObject(Nodes );
             Console.WriteLine(json);
@@ -464,8 +488,8 @@
         if (currentSelectedModelView != null)
         {
             var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
-                                                                          <FluentTextField @bind-Value=inputName   Label="Folder Name:" />
-                                                                          <FluentTextField @bind-Value=inputType   Label="Folder Extension:" />
+                                                                          <FluentTextField @bind-Value=inputName   Label="Input Name:" />
+                                                                          <FluentTextField @bind-Value=inputType   Label="Input Type:" />
                                                                       </div>
                 , new DialogParameters
                 {
@@ -495,14 +519,16 @@
     private async Task AddOutputNode(MouseEventArgs e)
     {
         // if (!await ValidateCreation()) return;
+
+        // currentSelectedModelView.Data;
         
         string outputName = string.Empty;
         string outputType = string.Empty;
         if (currentSelectedModelView != null)
         {
             var dialogInstance = await _dialogService.ShowDialogAsync(@<div>
-                                                                          <FluentTextField @bind-Value=outputName    Label="outputName:" />
-                                                                          <FluentTextField @bind-Value=outputType     Label="outputType:" />
+                                                                          <FluentTextField @bind-Value=outputName    Label="Output Name:" />
+                                                                          <FluentTextField @bind-Value=outputType     Label="Output Type:" />
                                                                       </div>
                 , new DialogParameters
                 {
@@ -580,5 +606,3 @@
     #endregion
     
 }
-
-

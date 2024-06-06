@@ -1,5 +1,6 @@
 ﻿@using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
+@using ParseSuite
 @using ScadeSuiteWeb.Shared.Utils
 @using ScadeSuiteWeb.Shared.ViewModels.PorjectModel
 @{
@@ -50,7 +51,7 @@
     <FluentMultiSplitterPane Size="15%" Min="50px" Max="70%">
         @if (Pj is not null)
         {
-            <LeftMenu Project="@Pj"  OnElementSelected="OnElementSelected"  />
+            <LeftMenu Project="@Pj"  OnElementSelected="OnElementSelected" OnInputSelected="OnInputSelected" OnOutputSelected="OnOutputSelected"   />
         }
     </FluentMultiSplitterPane>
 
@@ -96,8 +97,11 @@
 
     @* 右 panle index 2 *@
     <FluentMultiSplitterPane Size="20%">
-        <RightProperty SelectedElement="selectedElement" />
-         
+        <RightProperty
+            SelectedElement="selectedElement"
+            SelectedInput="selectedInput"
+            SelectedOutput="selectedOutput"
+        />
     </FluentMultiSplitterPane>
 
 </FluentMultiSplitter>
@@ -220,9 +224,25 @@
     }
     // -------------------------------------------------
     private SdyElement selectedElement;
+    private SSInput  selectedInput ;
+    private SSOutput selectedOutput;
+   
 
     private void OnElementSelected(SdyElement element)
     {
         selectedElement = element;
+        selectedElement.Actived = true;
+    }
+    
+    private void OnInputSelected(SSInput input)
+    {
+        selectedInput = input;
+        selectedInput.Actived = true;
+    }
+    
+    private void OnOutputSelected(SSOutput output)
+    {
+        selectedOutput = output;
+        selectedOutput.Actived = true;
     }
 }

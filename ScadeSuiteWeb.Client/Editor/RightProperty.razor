@@ -1,24 +1,53 @@
-﻿
+﻿@using ParseSuite
+
 <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: start; ">
     
     <h4>Properties</h4>
-    @if (SelectedElement is SdyFolder folder)
+    @if (SelectedElement is SdyFolder folder && SelectedElement  is { Actived: true })
     {
-        
-    <FluentTextField @bind-Value=folder.Name ReadOnly="true">folder name</FluentTextField>
-    <br>
-    <FluentTextField  @bind-Value=folder.Extensions ReadOnly="true">folder extension</FluentTextField>
+        <FluentTextField @bind-Value=folder.Name ReadOnly="true">folder name</FluentTextField>
+        <br>
+        <FluentTextField  @bind-Value=folder.Extensions ReadOnly="true">folder extension</FluentTextField>
     }
     
-    @if (SelectedElement is SdyFileRef fileRef)
+    @if (SelectedElement is SdyFileRef fileRef && SelectedElement  is { Actived: true })
     {
         <FluentTextField  @bind-Value=fileRef.PersistAs  ReadOnly="true">file PersistAs </FluentTextField>
     }
+    
+    
+    @if (SelectedInput is { Actived: true })
+    {
+        <FluentTextField @bind-Value=SelectedInput.Name ReadOnly="true">input name</FluentTextField>
+        <br>
+        <FluentTextField @bind-Value=SelectedInput.DataType ReadOnly="true">input DataType</FluentTextField>
+    }
+    
+    @if (SelectedOutput is { Actived: true })
+    {
+        <FluentTextField @bind-Value=SelectedOutput.Name ReadOnly="true">output name</FluentTextField>
+        <br>
+        <FluentTextField @bind-Value=SelectedOutput.DataType ReadOnly="true">output DataType</FluentTextField>
+    }
+
+
 </div>
 
 @code {
     [Parameter]
-    public SdyElement SelectedElement { get; set; }
+    public SdyElement? SelectedElement { get; set; }
+    
+    [Parameter]
+    public SSInput? SelectedInput { get; set; }
+    
+    [Parameter]
+    public SSOutput? SelectedOutput { get; set; }
 
-    string?  value5="Read only", value6="Read only";
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (SelectedElement!= null) SelectedElement.Actived = false;
+        if (SelectedInput != null) SelectedInput.Actived = false;
+        if (SelectedOutput != null) SelectedOutput.Actived = false;
+        base.OnAfterRender(firstRender);
+    }
 }

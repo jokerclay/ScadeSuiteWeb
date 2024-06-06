@@ -147,6 +147,8 @@
         public string DataType { get => dataType; set => dataType = value; }
         public string Comment { get => comment; set => comment = value; }
         public List<string> RequirementID { get => requirementID; set => requirementID = value; }
+
+        public bool Actived { get; set; } = false;
     }
     #endregion Input
 
@@ -161,6 +163,8 @@
         public string DataType { get => dataType; set => dataType = value; }
         public string Comment { get => comment; set => comment = value; }
         public List<string> RequirementID { get => requirementID; set => requirementID = value; }
+        
+        public bool Actived { get; set; } = false;
     }
     #endregion Output
 
