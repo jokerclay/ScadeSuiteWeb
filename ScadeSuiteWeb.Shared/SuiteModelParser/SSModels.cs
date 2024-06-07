@@ -248,6 +248,9 @@
         private List<SSSubNode> callNodes = new();
         private List<SSSubNode> calledNodes = new();
         private List<string> requirementID = new();
+        
+        public SSData Datas = new();
+        
 
         private string csuId = ""; //软件单元标识号
         private string csuVer = ""; //软件单元版本号
@@ -280,6 +283,13 @@
         public string InterruptionProcessing { get => interruptionProcessing; set => interruptionProcessing = value; }
         public string DataFile { get => dataFile; set => dataFile = value; }
     }
+
+    public class SSData
+    {
+        public List<SSInput> inputs = new();
+        public  List<SSOutput> outputs = new();
+    }
+
     #endregion Node
 
 

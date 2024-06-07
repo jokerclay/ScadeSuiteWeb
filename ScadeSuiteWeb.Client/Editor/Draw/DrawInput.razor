@@ -1,0 +1,22 @@
+﻿@using ParseSuite
+
+<h3>DrawInput</h3>
+
+
+@if (Input is not null)
+{
+    <g>
+        <line id="svg_red_line" x1="190" y1="130" x2="300" y2="190" stroke="#ff0000" />
+        <line id="svg_green_line" x1="300" y1="190" x2="190" y2="245" stroke="#00ff00" />
+        <line id="svg_blue_line" x1="300" y1="190" x2="435" y2="190" stroke="#0000ff" />
+        <text fill="black" x="190" y="190"  font-size="16px" font-family="Arial" text-anchor="start">
+            @Input.Name
+        </text>
+    </g>
+}
+
+
+@code {
+    [Parameter]
+    public SSInput? Input { get; set; }
+}

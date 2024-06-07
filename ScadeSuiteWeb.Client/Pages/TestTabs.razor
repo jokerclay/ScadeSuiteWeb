@@ -1,28 +1,65 @@
 ﻿@page "/TestTabs"
-
-<FluentTabs @bind-ActiveTabId="@activeid" OnTabChange="HandleOnTabChange">
+<FluentTabs ShowClose="true"
+            OnTabClose="@ClosedTab"
+            Size="TabSize.Medium">
     
-    <FluentTab Label="Tab one" Icon="@(new Icons.Regular.Size24.LeafOne())" Id="tab-1">
-        dffffff
-    </FluentTab>
-    
-    <FluentTab Label="Tab two" Id="tab-2">
-        
-        dadfadfadf
-    </FluentTab>
+    @foreach (var item in Items)
+    {
+        <FluentTab Id="@($"tab-{item.Index}")"
 
+                   LabelEditable="@Editable(item)"
+                   @bind-Label="@item.Name"
+                   Data="@item">
+
+            Content #@item.Index - @item.Name
+
+        </FluentTab>
+    }
 </FluentTabs>
 
-<p>Active tab changed to: @changedto?.Label</p>
+    SelectedTab ID
+    <br />
+    <FluentSelect Items="@Items"
+                  OptionValue="@(i => $"tab-{i.Index}")"
+                  @bind-Value="@SelectedTabId" />
+    <FluentButton OnClick="@AddAndSelect">Add and select</FluentButton>
+    
+@code
+{
+    List<DataSource.MonthItem> Items = new List<DataSource.MonthItem>(DataSource.AllMonths);
+    
+    string SelectedTabId = "tab-03";
+    
+    int i = 20;
 
-
-@code {
-    string? activeid = "tab-1";
-    FluentTab? changedto;
-
-    private void HandleOnTabChange(FluentTab tab)
+    void ClosedTab(FluentTab tab)
     {
-        changedto = tab;
+        if (Items.Count <= 1) return;   // Avoid to remove the single tab
+
+        Console.WriteLine($"Closed {tab.Label}");
+
+        // FluentTab.Id is required to manage correctly the Items.Remove tracking.
+        var month = (DataSource.MonthItem)tab.Data!;
+        Items.Remove(month);
+    }
+
+    bool Editable(DataSource.MonthItem item)
+    {
+        var index = Convert.ToInt32(item.Index);
+        return index % 2 == 0;
+    }
+
+    async Task AddAndSelect()
+    {
+        i++;
+        var item = new DataSource.MonthItem()
+            {
+                Index = $"{i:00}",
+                Name = $"New {i:00}",
+            };
+        Items.Add(item);
+        await Task.Delay(1);
+        SelectedTabId = $"tab-{item.Index}";
     }
     
 }

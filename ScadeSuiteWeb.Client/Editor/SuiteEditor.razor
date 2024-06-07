@@ -73,7 +73,7 @@
                       OnElementSelected="OnElementSelected"
                       OnInputSelected="OnInputSelected"
                       OnOutputSelected="OnOutputSelected"
-                      OnProjectModelSelected ="OnProjectModelSelected"
+                      OnNodeModelSelected ="OnNodeModelSelected"
             />
         }
     </FluentMultiSplitterPane>
@@ -84,7 +84,7 @@
             <FluentMultiSplitterPane Size="70%" Collapsible="true">
             
                 @* 中间画布 *@
-                <MainCanvasContent SelectedModel="selectedModel"/>
+                <MainCanvasContent SelectedNodeModel="selectedNodeModel"/>
                 
             </FluentMultiSplitterPane>
             
@@ -109,9 +109,7 @@
     @* 右 panle index 2 *@
     <FluentMultiSplitterPane Size="20%" Collapsible="true" >
         <RightProperty
-            SelectedElement="selectedElement"
-            SelectedInput="selectedInput"
-            SelectedOutput="selectedOutput"
+            SelectedItem ="selecteditem "
         />
     </FluentMultiSplitterPane>
 
@@ -235,32 +233,30 @@
     }
     // -------------------------------------------------
     private SdyElement selectedElement;
-    private SSInput  selectedInput ;
-    private SSOutput selectedOutput;
-    private SSModel  selectedModel;
-    
+    private object?  selecteditem ;
+    private SSNode  selectedNodeModel;
 
     private void OnElementSelected(SdyElement element)
     {
-        selectedElement = element;
-        selectedElement.Actived = true;
+        selecteditem = element;
+        // selectedElement.Actived = true;
     }
     
     private void OnInputSelected(SSInput input)
     {
-        selectedInput = input;
-        selectedInput.Actived = true;
+        selecteditem = input;
+        // selectedInput.Actived = true;
     }
     
     private void OnOutputSelected(SSOutput output)
     {
-        selectedOutput = output;
-        selectedOutput.Actived = true;
+        selecteditem = output;
+        // selectedOutput.Actived = true;
     }
     
-    private void OnProjectModelSelected(SSModel model)
+    private void OnNodeModelSelected(SSNode model)
     {
-        selectedModel = model;
+        selectedNodeModel = model;
         // selectedOutput.Actived = true;
     }
 }

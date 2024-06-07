@@ -1,8 +1,5 @@
 ﻿@using ParseSuite
-@*
-viewBox="@($"0 0 {_actualWidth} {_actualHeight}")" width="@(_actualWidth)" height="@(_actualHeight)"
-*@
-
+@using ScadeSuiteWeb.Client.Editor.Draw
 
 @* ---------- SVG 画布的 pattern 定义 ---------- *@
 <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;">
@@ -15,7 +12,7 @@ viewBox="@($"0 0 {_actualWidth} {_actualHeight}")" width="@(_actualWidth)" heigh
     </pattern>
 </svg>
 
-@if(SelectedModel!= null)    
+@if(SelectedNodeModel!= null)    
 {
     @* ---------- SVG 画布 ---------- *@
     <svg class="modeler-svg-canvas"  style="background-color: #fff; width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
@@ -27,13 +24,21 @@ viewBox="@($"0 0 {_actualWidth} {_actualHeight}")" width="@(_actualWidth)" heigh
               @oncontextmenu:stopPropagation
               @onmousedown:preventDefault
               @onmousedown:stopPropagation />
-        <text x="5" y="30" fill="pink" stroke="blue" font-size="35">@SelectedModel.Project</text>
+        <g>
+            @foreach (var input in SelectedNodeModel.Datas.inputs)
+            {
+                <DrawInput Input ="input"/>
+            }
+            @foreach (var output in SelectedNodeModel.Datas.outputs)
+            {
+                <DrawOutput Output="output "/>
+            }
+        </g>
     </svg>
     
 }
 
 @code {
     [Parameter]
-    public SSModel? SelectedModel { get; set; }
-    
+    public SSNode? SelectedNodeModel { get; set; }
 }

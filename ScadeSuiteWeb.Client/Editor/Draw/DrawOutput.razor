@@ -1,0 +1,19 @@
+﻿@using ParseSuite
+
+@if (Output  is not null)
+{
+    <g>
+        <line id="svg_red_line" x1="290" y1="130" x2="300" y2="290" stroke="#000" />
+        <line id="svg_green_line" x1="300" y1="290" x2="290" y2="245" stroke="#000" />
+        <line id="svg_blue_line" x1="300" y1="290" x2="435" y2="290" stroke="#000" />
+        <text fill="black"  x="290" y="290" font-size="16px" font-family="Arial" text-anchor="start">
+            @Output.Name
+        </text>
+    </g>
+}
+
+
+@code {
+    [Parameter]
+    public SSOutput? Output { get; set; }
+}

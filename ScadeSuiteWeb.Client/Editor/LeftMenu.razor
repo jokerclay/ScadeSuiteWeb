@@ -35,34 +35,36 @@
             @bind-CurrentSelected="currentSelectedModelView"
             OnExpandedChange="HandleOnExpandedChangedModelView"
             OnSelectedChange ="HandleOnSelectedChangedModelView">
-            <FluentTreeItem Id="nodesEditor" Text="@ProjectModelViewName" Data="modelPj">
-                <FluentTreeItem Text="Interface">
-                    @if (modelPj != null)
-                    {
-                        foreach (var node in modelPj.Nodes)
-                        {
-                            foreach (var inputNode in node.Inputs)
+            <FluentTreeItem Id="nodesEditor" Text="@ProjectModelViewName" Data="@modelPj">
+                @if (modelPj != null)
+                {
+                    <FluentTreeItem Text="@modelPj.Nodes[0].Name" Data="@modelPj.Nodes[0]">
+                        <FluentTreeItem Text="Interface">
+                            @if (modelPj != null)
                             {
-                                <FluentTreeItem Text="@inputNode.Name" Data="@inputNode">
-                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleLeft())" Color="@Color.Neutral" Slot="start"/>
-                                </FluentTreeItem>
-                            }
+                                foreach (var node in modelPj.Nodes)
+                                {
+                                    foreach (var inputNode in node.Inputs)
+                                    {
+                                        <FluentTreeItem Text="@inputNode.Name" Data="@inputNode">
+                                            <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleRight())" Color="@Color.Neutral" Slot="start"/>
+                                        </FluentTreeItem>
+                                    }
 
-                            foreach (var outputNode in node.Outputs)
-                            {
-                                <FluentTreeItem Text="@outputNode.Name" Data="@outputNode">
-                                    <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleRight())" Color="@Color.Neutral" Slot="start"/>
-                                </FluentTreeItem>
+                                    foreach (var outputNode in node.Outputs)
+                                    {
+                                        <FluentTreeItem Text="@outputNode.Name" Data="@outputNode">
+                                            <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleLeft())" Color="@Color.Neutral" Slot="start"/>
+                                        </FluentTreeItem>
+                                    }
+                                }
                             }
-                        }
-                    }
-                
-                </FluentTreeItem>
+                        </FluentTreeItem>
+                    </FluentTreeItem>
+                }
+
             </FluentTreeItem>
-                
         </FluentTreeView>
-        
-        
     </FluentTab>
 
 </FluentTabs>
@@ -116,7 +118,7 @@
     public EventCallback<SSOutput> OnOutputSelected { get; set; }
     
     [Parameter]
-    public EventCallback<SSModel> OnProjectModelSelected { get; set; }
+    public EventCallback<SSNode> OnNodeModelSelected { get; set; }
     
     public SdyFolder? root = new SdyFolder() { Name = "Root"};
     
@@ -147,9 +149,9 @@
          OnOutputSelected.InvokeAsync(output);
     }
     
-    private void SelectProjectModel(SSModel model)
+    private void SelectNodeModel(SSNode nodeModel)
     {
-         OnProjectModelSelected.InvokeAsync(model);
+         OnNodeModelSelected.InvokeAsync(nodeModel);
     }
     
     
@@ -248,25 +250,30 @@
     
     public SdyElement? SelectedElement { get;set; }
     public SSInput? SelectedInput { get;set; }
-    public SSModel? SelectedProjectModel { get;set; }
+    public SSNode? SelectedNodeModel { get;set; }
     private void HandleOnSelectedChangedModelView(FluentTreeItem item)
     {
         if (item.Data is SSInput)
         {
             SelectedInput = item.Data as SSInput;
             if (SelectedInput != null) SelectInput(SelectedInput);
+            if (SelectedNodeModel != null)
+                if (SelectedInput != null)
+                    SelectedNodeModel.Datas.inputs.Add(SelectedInput);
         }
         if (item.Data is SSOutput)
         {
             SelectedOutput = item.Data as SSOutput;
-
             if (SelectedOutput != null) SelectOutput(SelectedOutput);
+            if (SelectedNodeModel != null)
+                if (SelectedOutput != null)
+                    SelectedNodeModel.Datas.outputs.Add(SelectedOutput);
         }
         
-        if (item.Text == ProjectModelViewName)
+        if (modelPj != null && item.Text == modelPj.Nodes[0].Name)
         {
-            SelectedProjectModel = item.Data as SSModel;
-            if (SelectedProjectModel != null) SelectProjectModel(SelectedProjectModel );
+            SelectedNodeModel = item.Data as SSNode;
+            if (SelectedNodeModel != null) SelectNodeModel(SelectedNodeModel );
         }
     }
     

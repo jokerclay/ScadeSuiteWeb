@@ -3,51 +3,54 @@
 <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: start; ">
     
     <h4>Properties</h4>
-    @if (SelectedElement is SdyFolder folder && SelectedElement  is { Actived: true })
+    @if (SelectedItem is SdyFolder folder )
     {
         <FluentTextField @bind-Value=folder.Name ReadOnly="true">folder name</FluentTextField>
         <br>
         <FluentTextField  @bind-Value=folder.Extensions ReadOnly="true">folder extension</FluentTextField>
     }
     
-    @if (SelectedElement is SdyFileRef fileRef && SelectedElement  is { Actived: true })
+    @if (SelectedItem is SdyFileRef fileRef )
     {
         <FluentTextField  @bind-Value=fileRef.PersistAs  ReadOnly="true">file PersistAs </FluentTextField>
     }
     
-    
-    @if (SelectedInput is { Actived: true })
+    @if (SelectedItem is SSInput ||  SelectedItem is SSOutput )
     {
-        <FluentTextField @bind-Value=SelectedInput.Name ReadOnly="true">input name</FluentTextField>
+        <FluentTextField @bind-Value=@_name ReadOnly="true"> name</FluentTextField>
         <br>
-        <FluentTextField @bind-Value=SelectedInput.DataType ReadOnly="true">input DataType</FluentTextField>
+        <FluentTextField @bind-Value=@_dataType ReadOnly="true"> DataType</FluentTextField>
     }
     
-    @if (SelectedOutput is { Actived: true })
-    {
-        <FluentTextField @bind-Value=SelectedOutput.Name ReadOnly="true">output name</FluentTextField>
-        <br>
-        <FluentTextField @bind-Value=SelectedOutput.DataType ReadOnly="true">output DataType</FluentTextField>
-    }
-
-
 </div>
 
 @code {
     [Parameter]
-    public SdyElement? SelectedElement { get; set; }
+    public object? SelectedItem { get; set; }
     
-    [Parameter]
-    public SSInput? SelectedInput { get; set; }
-    
-    [Parameter]
-    public SSOutput? SelectedOutput { get; set; }
+    private string? _name;
+    private string? _dataType;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override void OnParametersSet()
     {
-        if (SelectedElement!= null) SelectedElement.Actived = false;
-        if (SelectedInput != null) SelectedInput.Actived = false;
-        if (SelectedOutput != null) SelectedOutput.Actived = false;
-        base.OnAfterRender(firstRender);
+        if (SelectedItem  is SSInput  input)
+        {
+            _name = input.Name;
+            _dataType = input.DataType;
+        }
+        
+        if (SelectedItem  is SSOutput  output)
+        {
+            _name = output.Name;
+            _dataType = output.DataType;
+        }
+        
+        
+        if (SelectedItem  is SdyElement element)
+        {
+            SelectedItem = element;
+        }
+        base.OnParametersSet();
     }
+
 }
