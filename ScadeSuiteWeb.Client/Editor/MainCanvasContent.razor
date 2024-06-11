@@ -1,44 +1,82 @@
 ﻿@using ParseSuite
 @using ScadeSuiteWeb.Client.Editor.Draw
 
-@* ---------- SVG 画布的 pattern 定义 ---------- *@
-<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;">
-    <pattern id="flow_canvas_grid_item" width="61" height="61" patternUnits="userSpaceOnUse">
-        <path id="flow_canvas_grid_path1" stroke-width="1" fill="none" d="M0 15L60 15M15 0L15 60M0 30L60 30M30 0L30 60M0 45L60 45M45 0L45 60" stroke="rgb(242,242,242)"></path>
-        <path id="flow_canvas_grid_path2" stroke-width="1" fill="none" d="M0 60L60 60M60 0L60 60" stroke="rgb(229,229,229)"></path>
-    </pattern>
-    <pattern xmlns="http://www.w3.org/2000/svg" patternUnits="userSpaceOnUse" id="flow_canvas_watermark_item" width="300" height="300">
-        <text x="150" y="100" font-size="18" transform="rotate(-45, 150, 150)" style="dominant-baseline: middle; text-anchor: middle;"></text>
-    </pattern>
-</svg>
-
-@if(SelectedNodeModel!= null)    
+@if (_nodeTabData is not null && _nodeTabData.Count > 0)
 {
-    @* ---------- SVG 画布 ---------- *@
-    <svg class="modeler-svg-canvas"  style="background-color: #fff; width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
-        <rect width="100%"
-              height="100%"
-              fill="url(#flow_canvas_grid_item)"
-              id="flow_canvas_grids_box"
-              @oncontextmenu:preventDefault
-              @oncontextmenu:stopPropagation
-              @onmousedown:preventDefault
-              @onmousedown:stopPropagation />
-        <g>
-            @foreach (var input in SelectedNodeModel.Datas.inputs)
-            {
-                <DrawInput Input ="input"/>
-            }
-            @foreach (var output in SelectedNodeModel.Datas.outputs)
-            {
-                <DrawOutput Output="output "/>
-            }
-        </g>
-    </svg>
-    
+
+    <FluentTabs ShowClose="true"
+                OnTabClose="@ClosedTab"
+                Height="100%"
+                Size="TabSize.Medium">
+        @foreach (var nodeTab in _nodeTabData)
+        {
+            <FluentTab Id="@(nodeTab.Name)"
+                       @bind-Label="@nodeTab.Name"
+                       Data="@nodeTab">
+
+                @* ---------- SVG 画布的 pattern 定义 ---------- *@
+                <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;">
+                    <pattern id="flow_canvas_grid_item" width="61" height="61" patternUnits="userSpaceOnUse">
+                        <path id="flow_canvas_grid_path1" stroke-width="1" fill="none" d="M0 15L60 15M15 0L15 60M0 30L60 30M30 0L30 60M0 45L60 45M45 0L45 60" stroke="rgb(242,242,242)"></path>
+                        <path id="flow_canvas_grid_path2" stroke-width="1" fill="none" d="M0 60L60 60M60 0L60 60" stroke="rgb(229,229,229)"></path>
+                    </pattern>
+                    <pattern xmlns="http://www.w3.org/2000/svg" patternUnits="userSpaceOnUse" id="flow_canvas_watermark_item" width="300" height="300">
+                        <text x="150" y="100" font-size="18" transform="rotate(-45, 150, 150)" style="dominant-baseline: middle; text-anchor: middle;"></text>
+                    </pattern>
+                </svg>
+
+                @* ---------- SVG 画布 ---------- *@
+                <svg class="modeler-svg-canvas" style="background-color: #fff; width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+                    <rect width="100%"
+                          height="100%"
+                          fill="url(#flow_canvas_grid_item)"
+                          id="flow_canvas_grids_box"
+                    @oncontextmenu:preventDefault
+                    @oncontextmenu:stopPropagation
+                    @onmousedown:preventDefault
+                    @onmousedown:stopPropagation />
+                    <g>
+                        @foreach (var input in nodeTab.Datas.inputs)
+                        {
+                            <DrawInput Input="input" />
+                        }
+                        @foreach (var output in nodeTab.Datas.outputs)
+                        {
+                            <DrawOutput Output="output" />
+                        }
+                    </g>
+                </svg>
+            </FluentTab>
+        }
+    </FluentTabs>
 }
+
 
 @code {
     [Parameter]
     public SSNode? SelectedNodeModel { get; set; }
+
+    private List<SSNode>? _nodeTabData = new List<SSNode>();
+
+    protected override void OnParametersSet()
+    {
+        if (_nodeTabData != null && SelectedNodeModel != null && !_nodeTabData.Contains(SelectedNodeModel))
+        {
+            _nodeTabData.Add(SelectedNodeModel);
+            SelectedNodeModel = null;
+        }
+        base.OnParametersSet();
+    }
+    
+    
+    void ClosedTab(FluentTab tab)
+    {
+        if (_nodeTabData is not null)
+        {
+            // Console.WriteLine($"Closed {tab.Label}");
+            // FluentTab.Id is required to manage correctly the Items.Remove tracking.
+            var node = (SSNode)tab.Data!;
+            _nodeTabData.Remove(node);
+        }
+    }
 }

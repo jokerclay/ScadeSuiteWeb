@@ -260,6 +260,7 @@
             if (SelectedNodeModel != null)
                 if (SelectedInput != null)
                     SelectedNodeModel.Datas.inputs.Add(SelectedInput);
+            return;
         }
         if (item.Data is SSOutput)
         {
@@ -268,12 +269,14 @@
             if (SelectedNodeModel != null)
                 if (SelectedOutput != null)
                     SelectedNodeModel.Datas.outputs.Add(SelectedOutput);
+            return;
         }
         
         if (modelPj != null && item.Text == modelPj.Nodes[0].Name)
         {
             SelectedNodeModel = item.Data as SSNode;
             if (SelectedNodeModel != null) SelectNodeModel(SelectedNodeModel );
+            return;
         }
     }
     
