@@ -15,6 +15,31 @@
     <script src="_content/Microsoft.FluentUI.AspNetCore.Components/js/loading-theme.js" type="text/javascript"></script>
     <link rel="icon" type="image/png" href="images/math/Plus.png" />
     <loading-theme storage-name="theme"></loading-theme>
+
+    <!-- 加载第三方 antv x6 库 -->
+
+    <!-- Load the main X6 library -->
+    <script  src="https://cdn.jsdelivr.net/npm/@antv/x6"></script>
+
+    <!-- Load the X6 selection plugin -->
+    <script  src="https://cdn.jsdelivr.net/npm/@antv/x6-plugin-selection"></script>
+
+    <!-- Load the X6 scroller plugin -->
+    <script  src="https://cdn.jsdelivr.net/npm/@antv/x6-plugin-scroller"></script>
+
+    <!-- Load the X6 snapline plugin -->
+    <script  src="https://cdn.jsdelivr.net/npm/@antv/x6-plugin-snapline"></script>
+
+
+    <!-- Load the X6 minimap plugin -->
+    <script  src="https://cdn.jsdelivr.net/npm/@antv/x6-plugin-minimap"></script>
+
+    <!-- Load the X6 minimap plugin -->
+    <script  src="https://cdn.jsdelivr.net/npm/@antv/x6-plugin-dnd"></script>
+
+    <script  src="https://cdn.jsdelivr.net/npm/@antv/x6-common"></script>
+
+    <script  src="https://cdn.jsdelivr.net/npm/@antv/x6-plugin-keyboard"></script>
 </head>
 
 <body>
@@ -32,6 +57,7 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 
 </html>

@@ -149,7 +149,35 @@
         public List<string> RequirementID { get => requirementID; set => requirementID = value; }
 
         public bool Actived { get; set; } = false;
+        
+        /*
+        x y h w
+        */
+        public  Presentation  presentation { get; set; }
     }
+
+    /// <summary>
+    /// 输入输出的图元表示层
+    /// </summary>
+    public class Presentation
+    {
+        public Position position;
+        public Size size;
+    }
+    
+    public class Position
+    {
+        public double X { get; set; } = 100;
+        public double Y { get; set; }    = 100;
+    }
+    
+    public class Size
+    {
+        public double Width { get; set; } = 100;
+        public double Height { get; set; } = 100;
+    }
+    
+    
     #endregion Input
 
     #region Output

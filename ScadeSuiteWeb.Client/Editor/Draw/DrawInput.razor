@@ -5,7 +5,9 @@
 
 @if (Input is not null)
 {
-    <g>
+    <g
+    @onmouseup="OnClick"
+    >
         <line id="svg_red_line" x1="190" y1="130" x2="300" y2="190" stroke="#ff0000" />
         <line id="svg_green_line" x1="300" y1="190" x2="190" y2="245" stroke="#00ff00" />
         <line id="svg_blue_line" x1="300" y1="190" x2="435" y2="190" stroke="#0000ff" />
@@ -15,8 +17,13 @@
     </g>
 }
 
-
 @code {
     [Parameter]
     public SSInput? Input { get; set; }
+    
+    private void OnClick(MouseEventArgs args)
+    {
+        Console.WriteLine($"{Input.Name} Clicked ....");
+    }
+    
 }
