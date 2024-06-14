@@ -7,7 +7,7 @@
 @inject IDialogService _dialogService
 @inject HttpClient Http
 @inject IModelManager ModelManager
-
+@inject DiagramService DiagramService
 
 <FluentTabs @bind-ActiveTabId="@activeid" OnTabChange="HandleOnTabChange">
     <FluentTab Label="file view" Id="tab-1">
@@ -46,14 +46,14 @@
                                 {
                                     foreach (var inputNode in node.Inputs)
                                     {
-                                        <FluentTreeItem Text="@inputNode.Name" Data="@inputNode">
+                                        <FluentTreeItem Text="@inputNode.Name" Data="@inputNode"  @ondblclick="() => HandleInputItemClick(inputNode)">
                                             <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleRight())" Color="@Color.Neutral" Slot="start"/>
                                         </FluentTreeItem>
                                     }
 
                                     foreach (var outputNode in node.Outputs)
                                     {
-                                        <FluentTreeItem Text="@outputNode.Name" Data="@outputNode">
+                                        <FluentTreeItem Text="@outputNode.Name" Data="@outputNode" @ondblclick="() => HandleOutputItemClick(outputNode)">
                                             <FluentIcon Value="@(new Icons.Regular.Size20.ArrowCircleLeft())" Color="@Color.Neutral" Slot="start"/>
                                         </FluentTreeItem>
                                     }
@@ -251,24 +251,25 @@
     public SdyElement? SelectedElement { get;set; }
     public SSInput? SelectedInput { get;set; }
     public SSNode? SelectedNodeModel { get;set; }
+    
     private void HandleOnSelectedChangedModelView(FluentTreeItem item)
     {
         if (item.Data is SSInput)
         {
             SelectedInput = item.Data as SSInput;
             if (SelectedInput != null) SelectInput(SelectedInput);
-            if (SelectedNodeModel != null)
-                if (SelectedInput != null)
-                    SelectedNodeModel.Datas.inputs.Add(SelectedInput);
+            // if (modelPj != null)
+            //     if (SelectedInput != null)
+            //         modelPj.Nodes[0].Datas.inputs.Add(SelectedInput);
             return;
         }
         if (item.Data is SSOutput)
         {
             SelectedOutput = item.Data as SSOutput;
             if (SelectedOutput != null) SelectOutput(SelectedOutput);
-            if (SelectedNodeModel != null)
-                if (SelectedOutput != null)
-                    SelectedNodeModel.Datas.outputs.Add(SelectedOutput);
+            // if (modelPj != null)
+            //     if (SelectedOutput != null)
+            //         modelPj.Nodes[0].Datas.outputs.Add(SelectedOutput);
             return;
         }
         
@@ -630,5 +631,18 @@
     }
     
     #endregion
+
+    private Task HandleInputItemClick(SSInput inputNode)
+    {
+        Console.WriteLine(inputNode.Name);
+        DiagramService.AddInputNode(inputNode);
+        return Task.CompletedTask;
+    }
     
+    private Task HandleOutputItemClick(SSOutput outputNode)
+    {
+        Console.WriteLine(outputNode.Name);
+        DiagramService.AddOutputNode(outputNode);
+        return Task.CompletedTask;
+    }
 }

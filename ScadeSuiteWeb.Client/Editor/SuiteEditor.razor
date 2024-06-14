@@ -83,7 +83,9 @@
         <FluentMultiSplitter  OnResize="@OnResizeHandler" Orientation="Orientation.Vertical">
             <FluentMultiSplitterPane Size="70%" Collapsible="true">
                 @* 中间画布 *@
-                <MainCanvasContent SelectedNodeModel="selectedNodeModel"/>
+                <MainCanvasContent
+                    SelectedNodeModel="selectedNodeModel"
+                    />
             </FluentMultiSplitterPane>
             
             <FluentMultiSplitterPane Size="30%" Collapsible="true">
@@ -226,24 +228,20 @@
     private void OnElementSelected(SdyElement element)
     {
         selecteditem = element;
-        // selectedElement.Actived = true;
     }
     
     private void OnInputSelected(SSInput input)
     {
         selecteditem = input;
-        // selectedInput.Actived = true;
     }
     
     private void OnOutputSelected(SSOutput output)
     {
         selecteditem = output;
-        // selectedOutput.Actived = true;
     }
     
     private void OnNodeModelSelected(SSNode model)
     {
         selectedNodeModel = model;
-        // selectedOutput.Actived = true;
     }
 }

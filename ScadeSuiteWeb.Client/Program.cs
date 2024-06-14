@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.FluentUI.AspNetCore.Components;
 using ScadeSuiteWeb.Client;
 using ScadeSuiteWeb.Client.Auth;
+using ScadeSuiteWeb.Client.Editor;
 using ScadeSuiteWeb.Client.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -19,6 +20,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<DragDropService>();
+builder.Services.AddScoped<DiagramService>();
 
 builder.Services.AddScoped<IModelManager, ModelManager>();
 builder.Services.AddFluentUIComponents();

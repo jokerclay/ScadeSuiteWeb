@@ -10,6 +10,7 @@ using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Geometry;
 using Microsoft.AspNetCore.Components;
 using ParseSuite;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 namespace ScadeSuiteWeb.Client.Editor.Draw;
 
@@ -22,9 +23,15 @@ public partial class Drawer
     public SSNode? NodeModel { get; set; }
     
     private BlazorDiagram Diagram { get; set; } = null!;
+    
+    [Inject]
+    public DiagramService DiagramService { get; set; }
 
     protected override void OnInitialized()
     {
+        DiagramService.OnInputAdded += HandleInputAdded;
+        DiagramService.OnOutputAdded += HandleOutputAdded;
+        
         /*---------------------------------------------------    
         对 Diagram 的配置
         ---------------------------------------------------*/
@@ -51,32 +58,46 @@ public partial class Drawer
         Diagram.RegisterComponent<OutputNodeModel, OutputNode>();
         Diagram.RegisterComponent<AddFuncNodeModel, AddFuncNode>();
 
+        
         /*---------------------------------------------------    
         input model
         ---------------------------------------------------*/
-        var node = Diagram.Nodes.Add(new InputNodeModel(new Point(80, 80)));
+        var node = new InputNodeModel(new Point(80, 80))
+        {
+            Title = "node",
+        };
+        Diagram.Nodes.Add(node );
+         
         node.AddPort(new XPortModel(node, true, PortAlignment.Right));
-        var node1 = Diagram.Nodes.Add(new InputNodeModel(new Point(180, 180)));
+        
+        var node1 = new InputNodeModel(new Point(180, 180))
+        {
+            Title = "node1"
+        };
+            
+        Diagram.Nodes.Add(node1);
         node1.AddPort(new XPortModel(node1, true, PortAlignment.Right));
-        
-        
-        
-        /*---------------------------------------------------    
+
+        /*---------------------------------------------------
         output model
         ---------------------------------------------------*/
-        var outputNode = Diagram.Nodes.Add(new OutputNodeModel(new Point(380, 180)));
+        
+        var outputNode =new OutputNodeModel(new Point(380, 180)) { Title = "output" };
+        Diagram.Nodes.Add(outputNode);
         outputNode.AddPort(new XPortModel(outputNode, false, PortAlignment.Left));
-
 
         
         /*---------------------------------------------------    
         add func model
         ---------------------------------------------------*/
-        var addFuncNode = Diagram.Nodes.Add(new AddFuncNodeModel(new Point(380, 180)));
+        var addFuncNode = new AddFuncNodeModel(new Point(380, 180)) { Title = "Add" };
+        Diagram.Nodes.Add(addFuncNode);
+        
         addFuncNode.AddPort(new XPortModel(addFuncNode, true, PortAlignment.Right));
         addFuncNode.AddPort(new XPortModel(addFuncNode, false, PortAlignment.BottomLeft));
         addFuncNode.AddPort(new XPortModel(addFuncNode, false, PortAlignment.Left));
     }
+    
 
     private LinkModel? ModelLinkCheck(Diagram diagram, ILinkable source, Anchor targetAnchor)
     {
@@ -94,5 +115,37 @@ public partial class Drawer
         var a = new SinglePortAnchor(port);
 
         return new LinkModel(a, targetAnchor);
+        
     }
+    
+    
+    private void HandleInputAdded(SSInput inputNode)
+    {
+        var node = new InputNodeModel(new Point(80, 80))
+        {
+            Title = inputNode.Name,
+        };
+        Diagram.Nodes.Add(node);
+        node.AddPort(new XPortModel(node, true, PortAlignment.Right));
+        StateHasChanged();
+    }
+
+    private void HandleOutputAdded(SSOutput outputNode)
+    {
+        var node = new OutputNodeModel(new Point(80, 80))
+        {
+            Title = outputNode.Name,
+        };
+        Diagram.Nodes.Add(node);
+        node.AddPort(new XPortModel(node, false, PortAlignment.Left));
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        DiagramService.OnInputAdded -= HandleInputAdded;
+        DiagramService.OnOutputAdded -= HandleOutputAdded;
+    }
+    
+    
 }
