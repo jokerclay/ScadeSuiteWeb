@@ -31,6 +31,7 @@ public partial class Drawer
     {
         DiagramService.OnInputAdded += HandleInputAdded;
         DiagramService.OnOutputAdded += HandleOutputAdded;
+        DiagramService.OnSymbolAdded += HandleSymbolAdded;
         
         /*---------------------------------------------------    
         对 Diagram 的配置
@@ -140,11 +141,22 @@ public partial class Drawer
         node.AddPort(new XPortModel(node, false, PortAlignment.Left));
         StateHasChanged();
     }
+    
+    private void HandleSymbolAdded()
+    {
+        var addFuncNode = new AddFuncNodeModel(new Point(380, 180)) { Title = "Add"};
+        addFuncNode.AddPort(new XPortModel(addFuncNode, true, PortAlignment.Right));
+        addFuncNode.AddPort(new XPortModel(addFuncNode, false, PortAlignment.BottomLeft));
+        addFuncNode.AddPort(new XPortModel(addFuncNode, false, PortAlignment.Left));
+        Diagram.Nodes.Add(addFuncNode);
+    }
+
 
     public void Dispose()
     {
         DiagramService.OnInputAdded -= HandleInputAdded;
         DiagramService.OnOutputAdded -= HandleOutputAdded;
+        DiagramService.OnSymbolAdded -= HandleSymbolAdded;
     }
     
     

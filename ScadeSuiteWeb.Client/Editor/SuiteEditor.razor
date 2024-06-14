@@ -10,14 +10,7 @@
 @inject NavigationManager Nm
 @inject HttpClient Http
 @inject IToastService ToastService
-
-@*
-
- OnDragEnter="@(e => Console.WriteLine($"{e.Source.Id} is entered in  {e.Target.Id}"))"
- OnDragLeave="@(e => Console.WriteLine($"{e.Source.Id} has left {e.Target.Id}"))"
- OnDropEnd="@(e => Console.WriteLine($"{e.Source.Id} dropped in {e.Target.Id}"))"
- 
-*@
+@inject DiagramService DiagramService
 
 <FluentDragContainer TItem="string">
 <FluentHeader Style="height:5vh;background-color:#efefef;">
@@ -34,7 +27,9 @@
     </FluentButton>
     
     <FluentHeader Style="background-color:#efefef; height: 90%; width: 60%; border-radius: 4px; border: 1px solid #ffffff;">
-        <FluentIcon Title="Plus" Value="@(Icon.FromImageUrl("images/math/Plus.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px" />
+        <FluentIcon
+            @ondblclick="@HandlePlusClick"
+            Title="Plus" Value="@(Icon.FromImageUrl("images/math/Plus.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px" />
         <FluentIcon Title="Minus"  Value="@(Icon.FromImageUrl("images/math/Minus.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px"/>
         <FluentIcon Title="Multiplication" Value="@(Icon.FromImageUrl("images/math/Multiplication.png "))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px"/>
         <FluentIcon Title="Polymorphic Division" Value="@(Icon.FromImageUrl("images/math/PolymorphicDivision.png"))" Width="25px" Color="@Color.Neutral" Slot="start" Style="margin: 0 10px"/>
@@ -243,5 +238,11 @@
     private void OnNodeModelSelected(SSNode model)
     {
         selectedNodeModel = model;
+    }
+    
+    private Task HandlePlusClick()
+    {
+        DiagramService.AddSymbol();
+        return Task.CompletedTask;
     }
 }

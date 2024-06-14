@@ -8,6 +8,7 @@ public class DiagramService
     public event Action<SSInput> OnInputAdded;
     public event Action<SSOutput> OnOutputAdded;
 
+    public event Action OnSymbolAdded;
     public void AddInputNode(SSInput inputNode)
     {
         OnInputAdded?.Invoke(inputNode);
@@ -16,5 +17,9 @@ public class DiagramService
     public void AddOutputNode(SSOutput outputNode)
     {
         OnOutputAdded?.Invoke(outputNode);
+    }
+    public void AddSymbol()
+    {
+        OnSymbolAdded?.Invoke();
     }
 }
