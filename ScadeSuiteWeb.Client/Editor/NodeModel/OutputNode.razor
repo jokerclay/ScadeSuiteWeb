@@ -1,0 +1,22 @@
+﻿@using Blazor.Diagrams.Components.Renderers
+@using Blazor.Diagrams.Core.Models
+
+<g class="output-node">
+    <g>
+        <line id="svg_red_line" x1="30" y1="30" x2="60" y2="60" stroke="#000"  stroke-width="3"/>
+        <line id="svg_green_line" x1="60" y1="60" x2="30" y2="90" stroke="#000" stroke-width="3"/>
+        <line id="svg_blue_line" x1="50" y1="60" x2="30" y2="60" stroke="#000" stroke-width="3"/>
+
+        <text fill="black" x="60" y="50" font-size="16px" font-family="Arial" text-anchor="start">
+            aaa
+        </text>
+    </g>
+    
+    <PortRenderer @key="'l'" Port="Node.GetPort(PortAlignment.Left)">
+        <circle class="hand" cx="30" cy="60" r="10" fill="red" />
+    </PortRenderer>
+</g>
+
+@code{
+    [Parameter] public OutputNodeModel Node { get; set; } = null!;
+}

@@ -1,20 +1,14 @@
 // Blazor Just talks to JavaScript, so we can use the window object to access the X6 library.
 (function (global) {
-    const {Graph,Shape } = global.X6;
-    const {Selection   } = global.X6PluginSelection;
-    const {Scroller    } = global.X6PluginScroller;
-    const {Snapline    } = global.X6PluginSnapline;
-    
     global.initializeGraph = function () {
-        console.log('app.js is running');
+        // console.log('app.js is running');
         const container = document.getElementById('container');
-        console.log(container);
-
+        // console.log(container);
         if (container) {
             const { Graph, Shape } = global.X6;
             const { Selection } = global.X6PluginSelection;
-            const { Scroller } = global.X6PluginScroller;
-            const { Snapline } = global.X6PluginSnapline;
+            const { Scroller  } = global.X6PluginScroller;
+            const { Snapline  } = global.X6PluginSnapline;
 
             const graph = new Graph({
                 container: container,
@@ -60,7 +54,7 @@
                     },
                     validateConnection({sourceCell, targetCell, sourceMagnet, targetMagnet,})
                     {
-/*
+
                         const SourcePortId = sourceMagnet.getAttribute('port')
                         const TargetPortId = targetMagnet .getAttribute('port')
                         let SourceNodeType = getPortIdFirstPart(SourcePortId)
@@ -85,7 +79,6 @@
                         if (edges.find((edge) => edge.getTargetPortId() === TargetPortId)) {
                             return false
                         }
-*/
 
                         // 不能连接自身
                         return sourceCell !== targetCell;
